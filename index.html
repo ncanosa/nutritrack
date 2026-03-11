@@ -1055,7 +1055,7 @@ document.addEventListener('click', e=>{
   }
 });
 
-
+function quickAdd(mealId,idx){
   const f=QUICK_FOODS[mealId][idx];
   if(!state[mealId])state[mealId]=[];
   state[mealId].push({...f});
