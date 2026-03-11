@@ -267,6 +267,39 @@ header {
 .toast.ok  { border-color:rgba(61,214,140,.4); }
 .toast.err { border-color:rgba(248,113,113,.4); }
 
+/* ─── FOOD SEARCH AUTOCOMPLETE ─── */
+.food-search-wrap { position:relative; flex:1; min-width:0; }
+.food-search-wrap .inp { width:100%; }
+.autocomplete-drop {
+  position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:500;
+  background:var(--card); border:1px solid var(--border2); border-radius:11px;
+  overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.4);
+  max-height:220px; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  display:none;
+}
+.autocomplete-drop.open { display:block; }
+.ac-item {
+  padding:10px 13px; cursor:pointer; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  transition:background .1s;
+}
+.ac-item:last-child { border-bottom:none; }
+.ac-item:active { background:rgba(61,214,140,.08); }
+.ac-name { font-size:0.82rem; font-weight:500; }
+.ac-macros { font-size:0.69rem; color:var(--muted); white-space:nowrap; }
+.ac-per { font-size:0.65rem; color:var(--muted); white-space:nowrap; }
+
+.food-form-row1 { display:flex; gap:7px; align-items:flex-end; margin-bottom:7px; }
+.food-form-row2 { display:flex; gap:6px; align-items:flex-end; flex-wrap:wrap; }
+.food-form-row2 .form-group .inp { border-color:rgba(61,214,140,.3); }
+.gram-hint { font-size:0.68rem; color:var(--muted); margin-top:4px; font-style:italic; }
+.selected-food-badge {
+  display:flex; align-items:center; gap:6px; background:rgba(61,214,140,.1);
+  border:1px solid rgba(61,214,140,.3); border-radius:8px; padding:5px 10px;
+  font-size:0.75rem; color:var(--green); margin-bottom:8px; flex-wrap:wrap;
+}
+.selected-food-badge button { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.8rem; margin-left:auto; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
@@ -481,7 +514,138 @@ const MEALS = [
   { id:'cena',        name:'Cena',         icon:'🌙',  color:'rgba(96,165,250,.12)', time:'21:00 - 22:00' },
 ];
 
-// Lun/Mié/Vie: Natación | Mar/Jue: Musculación | Sáb/Dom: Descanso
+// ══════════════════════════════════════════════════
+//  FOOD DATABASE (macros por 100g)
+// ══════════════════════════════════════════════════
+const FOOD_DB = [
+  // ── FRUTAS ──
+  {n:'Manzana',           k:52,  p:0.3, c:14,  f:0.2},
+  {n:'Banana',            k:89,  p:1.1, c:23,  f:0.3},
+  {n:'Naranja',           k:47,  p:0.9, c:12,  f:0.1},
+  {n:'Mandarina',         k:53,  p:0.8, c:13,  f:0.3},
+  {n:'Pera',              k:57,  p:0.4, c:15,  f:0.1},
+  {n:'Durazno',           k:39,  p:0.9, c:10,  f:0.3},
+  {n:'Ciruela',           k:46,  p:0.7, c:11,  f:0.3},
+  {n:'Uva',               k:69,  p:0.7, c:18,  f:0.2},
+  {n:'Sandía',            k:30,  p:0.6, c:7.6, f:0.2},
+  {n:'Melón',             k:34,  p:0.8, c:8,   f:0.2},
+  {n:'Frutilla',          k:32,  p:0.7, c:7.7, f:0.3},
+  {n:'Kiwi',              k:61,  p:1.1, c:15,  f:0.5},
+  {n:'Ananá (piña)',      k:50,  p:0.5, c:13,  f:0.1},
+  {n:'Mango',             k:60,  p:0.8, c:15,  f:0.4},
+  {n:'Pomelo',            k:42,  p:0.8, c:11,  f:0.1},
+  {n:'Limón',             k:29,  p:1.1, c:9,   f:0.3},
+  {n:'Cereza',            k:63,  p:1,   c:16,  f:0.2},
+  {n:'Higo',              k:74,  p:0.8, c:19,  f:0.3},
+  {n:'Arándano',          k:57,  p:0.7, c:14,  f:0.3},
+  {n:'Palta (aguacate)',  k:160, p:2,   c:9,   f:15},
+  // ── VERDURAS A (bajo HC) ──
+  {n:'Lechuga',           k:15,  p:1.4, c:2.9, f:0.2},
+  {n:'Tomate',            k:18,  p:0.9, c:3.9, f:0.2},
+  {n:'Pepino',            k:16,  p:0.7, c:3.6, f:0.1},
+  {n:'Espinaca',          k:23,  p:2.9, c:3.6, f:0.4},
+  {n:'Acelga',            k:19,  p:1.8, c:3.7, f:0.2},
+  {n:'Apio',              k:16,  p:0.7, c:3,   f:0.2},
+  {n:'Zapallito',         k:17,  p:1.2, c:3.1, f:0.3},
+  {n:'Berenjena',         k:25,  p:1,   c:5.9, f:0.2},
+  {n:'Coliflor',          k:25,  p:1.9, c:5,   f:0.3},
+  {n:'Brócoli',           k:34,  p:2.8, c:7,   f:0.4},
+  {n:'Morrón rojo',       k:31,  p:1,   c:6,   f:0.3},
+  {n:'Morrón verde',      k:20,  p:0.9, c:4.6, f:0.2},
+  {n:'Rabanito',          k:16,  p:0.7, c:3.4, f:0.1},
+  {n:'Repollo',           k:25,  p:1.3, c:5.8, f:0.1},
+  {n:'Champiñones',       k:22,  p:3.1, c:3.3, f:0.3},
+  // ── VERDURAS B (HC medio) ──
+  {n:'Cebolla',           k:40,  p:1.1, c:9.3, f:0.1},
+  {n:'Zanahoria',         k:41,  p:0.9, c:10,  f:0.2},
+  {n:'Zapallo',           k:26,  p:1,   c:6.5, f:0.1},
+  {n:'Remolacha',         k:43,  p:1.6, c:10,  f:0.2},
+  {n:'Chaucha',           k:31,  p:1.8, c:7,   f:0.1},
+  {n:'Puerro',            k:61,  p:1.5, c:14,  f:0.3},
+  {n:'Arveja fresca',     k:81,  p:5.4, c:14,  f:0.4},
+  // ── VERDURAS C (alto HC) ──
+  {n:'Papa',              k:77,  p:2,   c:17,  f:0.1},
+  {n:'Batata',            k:86,  p:1.6, c:20,  f:0.1},
+  {n:'Choclo',            k:96,  p:3.4, c:21,  f:1.5},
+  {n:'Mandioca',          k:160, p:1.4, c:38,  f:0.3},
+  // ── CARNES ──
+  {n:'Pechuga de pollo',  k:165, p:31,  c:0,   f:3.6},
+  {n:'Muslo de pollo',    k:209, p:26,  c:0,   f:11},
+  {n:'Carne picada magra',k:218, p:26,  c:0,   f:12},
+  {n:'Bife de lomo',      k:171, p:29,  c:0,   f:5},
+  {n:'Bife de cuadril',   k:160, p:28,  c:0,   f:4.5},
+  {n:'Nalga',             k:155, p:28,  c:0,   f:4},
+  {n:'Peceto',            k:140, p:28,  c:0,   f:3},
+  {n:'Lomo de cerdo',     k:143, p:26,  c:0,   f:3.5},
+  {n:'Merluza',           k:72,  p:16,  c:0,   f:0.7},
+  {n:'Salmón',            k:208, p:20,  c:0,   f:13},
+  {n:'Atún al natural (lata)', k:116,p:26, c:0, f:1},
+  {n:'Atún en aceite (lata)',  k:198,p:29, c:0, f:9},
+  {n:'Sardinas',          k:208, p:25,  c:0,   f:11},
+  {n:'Caballa',           k:205, p:19,  c:0,   f:14},
+  {n:'Trucha',            k:141, p:20,  c:0,   f:6},
+  {n:'Tiburón / cazón',   k:130, p:22,  c:0,   f:4},
+  // ── HUEVOS / LÁCTEOS ──
+  {n:'Huevo entero',      k:155, p:13,  c:1.1, f:11},
+  {n:'Clara de huevo',    k:52,  p:11,  c:0.7, f:0.2},
+  {n:'Leche descremada',  k:35,  p:3.4, c:5,   f:0.1},
+  {n:'Leche entera',      k:61,  p:3.2, c:4.8, f:3.3},
+  {n:'Yogur descremado',  k:36,  p:4,   c:4.2, f:0.1},
+  {n:'Yogur griego',      k:59,  p:10,  c:3.6, f:0.4},
+  {n:'Queso port salut',  k:291, p:21,  c:1,   f:22},
+  {n:'Queso cottage',     k:98,  p:11,  c:3.4, f:4.3},
+  {n:'Queso crema light', k:105, p:14,  c:3.8, f:3.5},
+  {n:'Ricota descremada', k:136, p:11,  c:3,   f:9},
+  // ── CEREALES / PAN / PASTA ──
+  {n:'Arroz blanco (crudo)',    k:365,p:7,  c:80,  f:0.7},
+  {n:'Arroz integral (crudo)',  k:370,p:8,  c:77,  f:2.9},
+  {n:'Avena arrollada',         k:389,p:17, c:66,  f:7},
+  {n:'Fideos secos (crudo)',     k:371,p:13, c:74,  f:1.5},
+  {n:'Pan integral',            k:265,p:9,  c:51,  f:3.5},
+  {n:'Pan lactal blanco',       k:265,p:8,  c:51,  f:3.2},
+  {n:'Pan francés / miñón',     k:270,p:9,  c:55,  f:1.5},
+  {n:'Quinoa (cruda)',           k:368,p:14, c:64,  f:6},
+  {n:'Polenta (cruda)',          k:360,p:8,  c:75,  f:1.5},
+  {n:'Maíz pisingallo (pochoclo)', k:375,p:11, c:74, f:4.3},
+  {n:'Granola',                 k:471,p:10, c:60,  f:20},
+  {n:'Muesli',                  k:350,p:9,  c:60,  f:8},
+  {n:'Corn flakes',             k:357,p:8,  c:84,  f:0.8},
+  // ── LEGUMBRES ──
+  {n:'Lentejas (cocidas)',       k:116,p:9,  c:20,  f:0.4},
+  {n:'Garbanzos (cocidos)',      k:164,p:9,  c:27,  f:2.6},
+  {n:'Porotos negros (cocidos)', k:132,p:9,  c:24,  f:0.5},
+  {n:'Arvejas secas (cocidas)',  k:116,p:8,  c:21,  f:0.4},
+  {n:'Soja texturizada (seca)',  k:325,p:52, c:29,  f:1},
+  // ── FRUTOS SECOS / SEMILLAS ──
+  {n:'Almendras',               k:579,p:21, c:22,  f:50},
+  {n:'Nueces',                  k:654,p:15, c:14,  f:65},
+  {n:'Maní',                    k:567,p:26, c:16,  f:49},
+  {n:'Castañas de cajú',        k:553,p:18, c:30,  f:44},
+  {n:'Semillas de chía',        k:486,p:17, c:42,  f:31},
+  {n:'Semillas de lino',        k:534,p:18, c:29,  f:42},
+  {n:'Semillas de girasol',     k:584,p:21, c:20,  f:51},
+  // ── ACEITES / GRASAS ──
+  {n:'Aceite de oliva',         k:884,p:0,  c:0,   f:100},
+  {n:'Aceite de girasol',       k:884,p:0,  c:0,   f:100},
+  {n:'Manteca',                 k:717,p:0.9,c:0.1, f:81},
+  {n:'Palta (aguacate)',        k:160,p:2,  c:9,   f:15},
+  // ── DULCES / VARIOS ──
+  {n:'Miel',                    k:304,p:0.3,c:82,  f:0},
+  {n:'Mermelada',               k:250,p:0.4,c:65,  f:0.1},
+  {n:'Dulce de leche',          k:320,p:7,  c:55,  f:8},
+  {n:'Azúcar',                  k:387,p:0,  c:100, f:0},
+  // ── BEBIDAS ──
+  {n:'Leche descremada (ml)',   k:35,  p:3.4,c:5,   f:0.1},
+  {n:'Jugo de naranja natural', k:45,  p:0.7,c:10,  f:0.2},
+  {n:'Café (solo, sin azúcar)', k:2,   p:0.3,c:0,   f:0},
+  // ── PREPARACIONES TÍPICAS ──
+  {n:'Milanesa de carne',       k:250, p:22, c:15,  f:10},
+  {n:'Milanesa de pollo',       k:220, p:22, c:15,  f:8},
+  {n:'Tapa de empanada (1u)',   k:110, p:2.5,c:18,  f:3},
+  {n:'Arroz con leche (100g)',  k:130, p:3,  c:24,  f:3},
+];
+
+// ── MEALS constant
 const TRAINING = {
   1:{ type:'swim', label:'🏊 Natación' },
   2:{ type:'gym',  label:'🏋️ Musculación' },
@@ -675,13 +839,36 @@ function renderFoodList(mealId, foods){
 }
 
 function renderAddForm(mealId){
-  return `<div class="add-form">
-    <div class="form-group"><label>Alimento</label><input class="inp w-food" id="fname-${mealId}" placeholder="ej: Pollo 150g" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-    <div class="form-group"><label>Kcal</label><input class="inp w-num" id="fkcal-${mealId}" type="number" inputmode="decimal" placeholder="250" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-    <div class="form-group"><label>Prot g</label><input class="inp w-num" id="fprot-${mealId}" type="number" inputmode="decimal" placeholder="30" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-    <div class="form-group"><label>HC g</label><input class="inp w-num" id="fcarb-${mealId}" type="number" inputmode="decimal" placeholder="20" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-    <div class="form-group"><label>Grasas g</label><input class="inp w-num" id="ffat-${mealId}" type="number" inputmode="decimal" placeholder="8" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-    <button class="btn sm" onclick="addFood('${mealId}')" style="margin-top:19px">+ Agregar</button>
+  return `
+  <div style="margin-bottom:6px">
+    <div class="food-form-row1">
+      <div class="food-search-wrap" id="fsw-${mealId}">
+        <div class="form-group" style="width:100%">
+          <label>Buscar alimento</label>
+          <input class="inp" id="fsearch-${mealId}" placeholder="ej: ciruela, pollo, avena..."
+            autocomplete="off" autocorrect="off" spellcheck="false"
+            oninput="onFoodSearch('${mealId}')"
+            onkeydown="onFoodSearchKey(event,'${mealId}')"
+            onfocus="onFoodSearch('${mealId}')">
+        </div>
+        <div class="autocomplete-drop" id="fdrop-${mealId}"></div>
+      </div>
+      <div class="form-group">
+        <label>Cantidad (g/ml)</label>
+        <input class="inp w-num" id="fgrams-${mealId}" type="number" inputmode="decimal" placeholder="100"
+          oninput="onGramsChange('${mealId}')"
+          onkeydown="if(event.key==='Enter')addFood('${mealId}')">
+      </div>
+    </div>
+    <div id="fselected-${mealId}" style="display:none"></div>
+    <div class="food-form-row2">
+      <div class="form-group"><label>Kcal</label><input class="inp w-num" id="fkcal-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>Prot g</label><input class="inp w-num" id="fprot-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>HC g</label><input class="inp w-num" id="fcarb-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>Grasa g</label><input class="inp w-num" id="ffat-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <button class="btn sm" onclick="addFood('${mealId}')" style="margin-top:19px">+ Agregar</button>
+    </div>
+    <div class="gram-hint" id="fhint-${mealId}" style="display:none"></div>
   </div>`;
 }
 
@@ -727,19 +914,148 @@ function toggleMeal(id){
 }
 
 function addFood(mealId){
-  const name=document.getElementById('fname-'+mealId).value.trim();
+  const nameEl=document.getElementById('fsearch-'+mealId);
+  const name=(nameEl?nameEl.value.trim():'')||(document.getElementById('fname-'+mealId)||{value:''}).value.trim();
   const kcal=parseFloat(document.getElementById('fkcal-'+mealId).value)||0;
   const prot=parseFloat(document.getElementById('fprot-'+mealId).value)||0;
   const carb=parseFloat(document.getElementById('fcarb-'+mealId).value)||0;
   const fat =parseFloat(document.getElementById('ffat-' +mealId).value)||0;
-  if(!name){showToast('Ingresá el nombre del alimento','err');return;}
-  if(!kcal&&!prot&&!carb&&!fat){showToast('Ingresá al menos un valor','err');return;}
+  const grams=parseFloat((document.getElementById('fgrams-'+mealId)||{}).value)||null;
+  const displayName = grams && window._selectedFood && window._selectedFood[mealId]
+    ? `${window._selectedFood[mealId].n} (${grams}g)` : name;
+  if(!displayName){showToast('Ingresá el nombre del alimento','err');return;}
+  if(!kcal&&!prot&&!carb&&!fat){showToast('Ingresá al menos un valor o seleccioná un alimento','err');return;}
   if(!state[mealId])state[mealId]=[];
-  state[mealId].push({name,kcal,prot,carb,fat});
-  saveState(); refresh(); showToast('✅ '+name+' agregado');
+  state[mealId].push({name:displayName,kcal,prot,carb,fat});
+  // clear selected food state
+  if(window._selectedFood) delete window._selectedFood[mealId];
+  saveState(); refresh(); showToast('✅ '+displayName+' agregado');
 }
 
-function quickAdd(mealId,idx){
+// ══════════════════════════════════════════════════
+//  FOOD SEARCH & AUTOCOMPLETE
+// ══════════════════════════════════════════════════
+window._selectedFood = {};
+window._acFocusIdx = {};
+
+function normalize(str){ return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+function searchFoods(query){
+  const q=normalize(query.trim());
+  if(!q)return[];
+  const words=q.split(/\s+/);
+  return FOOD_DB.filter(f=>{
+    const fn=normalize(f.n);
+    return words.every(w=>fn.includes(w));
+  }).slice(0,8);
+}
+
+function onFoodSearch(mealId){
+  const input=document.getElementById('fsearch-'+mealId);
+  const drop=document.getElementById('fdrop-'+mealId);
+  const query=input.value;
+  const results=searchFoods(query);
+  window._acFocusIdx[mealId]=-1;
+
+  if(!results.length||!query.trim()){
+    drop.classList.remove('open'); drop.innerHTML=''; return;
+  }
+  drop.innerHTML=results.map((f,i)=>`
+    <div class="ac-item" id="acitem-${mealId}-${i}"
+      onmousedown="selectFood('${mealId}',${FOOD_DB.indexOf(f)})"
+      ontouchstart="selectFood('${mealId}',${FOOD_DB.indexOf(f)})">
+      <span class="ac-name">${f.n}</span>
+      <span class="ac-macros">
+        <span style="color:var(--purple)">${f.k}kcal</span>
+        <span style="color:var(--green)">${f.p}gP</span>
+        <span style="color:var(--cyan)">${f.c}gHC</span>
+        <span style="color:var(--amber)">${f.f}gG</span>
+        <span class="ac-per">/ 100g</span>
+      </span>
+    </div>`).join('');
+  drop.classList.add('open');
+}
+
+function onFoodSearchKey(e, mealId){
+  const drop=document.getElementById('fdrop-'+mealId);
+  const items=drop.querySelectorAll('.ac-item');
+  if(!items.length) return;
+  let idx=window._acFocusIdx[mealId]||-1;
+
+  if(e.key==='ArrowDown'){ e.preventDefault(); idx=Math.min(idx+1,items.length-1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); idx=Math.max(idx-1,-1); }
+  else if(e.key==='Enter'&&idx>=0){ e.preventDefault(); items[idx].dispatchEvent(new Event('mousedown')); return; }
+  else if(e.key==='Escape'){ drop.classList.remove('open'); return; }
+  else if(e.key==='Enter'){ addFood(mealId); return; }
+
+  window._acFocusIdx[mealId]=idx;
+  items.forEach((el,i)=>el.style.background=i===idx?'rgba(61,214,140,.1)':'');
+}
+
+function selectFood(mealId, foodIdx){
+  const food=FOOD_DB[foodIdx];
+  if(!food) return;
+  window._selectedFood[mealId]=food;
+
+  // Update search input
+  document.getElementById('fsearch-'+mealId).value=food.n;
+  document.getElementById('fdrop-'+mealId).classList.remove('open');
+
+  // Show selected badge
+  const badge=document.getElementById('fselected-'+mealId);
+  badge.style.display='flex';
+  badge.innerHTML=`<div class="selected-food-badge">
+    <span>✅ <strong>${food.n}</strong> — por 100g: <span style="color:var(--purple)">${food.k}kcal</span> · <span style="color:var(--green)">${food.p}g P</span> · <span style="color:var(--cyan)">${food.c}g HC</span> · <span style="color:var(--amber)">${food.f}g G</span></span>
+    <button onclick="clearSelectedFood('${mealId}')">✕</button>
+  </div>`;
+
+  // Show hint and pre-fill with 100g default
+  const hint=document.getElementById('fhint-'+mealId);
+  hint.style.display='block';
+  hint.textContent='Los macros se calculan automáticamente según los gramos que ingreses.';
+
+  const gramsInput=document.getElementById('fgrams-'+mealId);
+  if(!gramsInput.value) gramsInput.value=100;
+  calcMacrosFromGrams(mealId);
+  gramsInput.focus();
+}
+
+function clearSelectedFood(mealId){
+  delete window._selectedFood[mealId];
+  document.getElementById('fsearch-'+mealId).value='';
+  document.getElementById('fselected-'+mealId).style.display='none';
+  document.getElementById('fhint-'+mealId).style.display='none';
+  document.getElementById('fgrams-'+mealId).value='';
+  ['fkcal','fprot','fcarb','ffat'].forEach(id=>{
+    const el=document.getElementById(id+'-'+mealId);
+    if(el){el.value='';el.style.borderColor='';}
+  });
+  document.getElementById('fsearch-'+mealId).focus();
+}
+
+function onGramsChange(mealId){
+  if(window._selectedFood && window._selectedFood[mealId]) calcMacrosFromGrams(mealId);
+}
+
+function calcMacrosFromGrams(mealId){
+  const food=window._selectedFood[mealId];
+  if(!food) return;
+  const grams=parseFloat(document.getElementById('fgrams-'+mealId).value)||0;
+  const factor=grams/100;
+  document.getElementById('fkcal-'+mealId).value=+(food.k*factor).toFixed(1);
+  document.getElementById('fprot-'+mealId).value=+(food.p*factor).toFixed(1);
+  document.getElementById('fcarb-'+mealId).value=+(food.c*factor).toFixed(1);
+  document.getElementById('ffat-' +mealId).value=+(food.f*factor).toFixed(1);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e=>{
+  if(!e.target.closest('[id^="fsw-"]')) {
+    document.querySelectorAll('.autocomplete-drop').forEach(d=>d.classList.remove('open'));
+  }
+});
+
+
   const f=QUICK_FOODS[mealId][idx];
   if(!state[mealId])state[mealId]=[];
   state[mealId].push({...f});
