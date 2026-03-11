@@ -172,7 +172,7 @@ header {
 .btn:active { opacity:.85; transform:scale(0.97); }
 .btn.ghost { background:transparent; color:var(--green); border:1px solid rgba(61,214,140,.35); }
 .btn.ghost:active { background:rgba(61,214,140,.08); }
-.btn.ai { background:linear-gradient(135deg,#3dd68c,#22d3ee); color:#000; }
+.btn.ai { background:linear-gradient(135deg,#3dd68c,#22d3ee); color:#000; position:relative; z-index:1; }
 .btn.sm { padding:8px 12px; font-size:0.72rem; }
 .btn.danger { background:rgba(248,113,113,.15); color:var(--red); border:1px solid rgba(248,113,113,.3); }
 
@@ -193,7 +193,7 @@ header {
 .ai-tag { background:linear-gradient(135deg,#3dd68c,#22d3ee); color:#000; font-size:0.58rem; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; padding:2px 7px; border-radius:8px; }
 .ai-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.93rem; }
 .meal-sel { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:11px; }
-.mchip { background:var(--bg3); border:1px solid var(--border); color:var(--muted); font-size:0.69rem; padding:5px 9px; border-radius:10px; cursor:pointer; transition:all .15s; }
+.mchip { background:var(--bg3); border:1px solid var(--border); color:var(--muted); font-size:0.69rem; padding:5px 9px; border-radius:10px; cursor:pointer; transition:all .15s; position:relative; z-index:1; }
 .mchip.sel { background:rgba(61,214,140,.12); border-color:var(--green); color:var(--green); font-weight:600; }
 .ai-out { background:var(--bg3); border:1px solid var(--border); border-radius:11px; padding:12px; min-height:80px; font-size:0.8rem; line-height:1.6; max-height:380px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .ai-placeholder { text-align:center; padding:16px 0; }
@@ -1162,6 +1162,94 @@ function openWeightPanel(){
 // ══════════════════════════════════════════════════
 //  AI SUGGESTIONS  (Gemini Flash — gratuito)
 // ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  MEAL TEMPLATES & LOCAL SUGGESTION ENGINE
+// ══════════════════════════════════════════════════
+const MEAL_TEMPLATES = {
+  desayuno: [
+    { title:'Avena con frutas', items:['Avena arrollada','Banana','Yogur descremado','Miel'] },
+    { title:'Tostadas con huevo y palta', items:['Pan integral','Huevo entero','Palta (aguacate)'] },
+    { title:'Bowl de yogur', items:['Yogur griego','Granola','Frutilla','Miel'] },
+    { title:'Clásico nutritivo', items:['Huevo entero','Pan integral','Leche descremada (ml)','Banana'] },
+    { title:'Avena con leche', items:['Avena arrollada','Leche descremada (ml)','Manzana','Almendras'] },
+  ],
+  media: [
+    { title:'Snack frutal', items:['Manzana','Yogur descremado','Almendras'] },
+    { title:'Snack energético', items:['Banana','Nueces','Yogur griego'] },
+    { title:'Fruta y semillas', items:['Naranja','Semillas de chía','Yogur descremado'] },
+    { title:'Mix de frutos secos', items:['Almendras','Castañas de cajú','Mandarina'] },
+    { title:'Yogur con kiwi', items:['Yogur griego','Kiwi','Miel'] },
+  ],
+  almuerzo: [
+    { title:'Pollo con arroz integral', items:['Pechuga de pollo','Arroz integral (crudo)','Brócoli','Aceite de oliva'] },
+    { title:'Carne con papa', items:['Bife de cuadril','Papa','Espinaca','Aceite de oliva'] },
+    { title:'Merluza al horno', items:['Merluza','Arroz blanco (crudo)','Zapallito','Aceite de oliva'] },
+    { title:'Bowl de quinoa con pollo', items:['Quinoa (cruda)','Pechuga de pollo','Tomate','Palta (aguacate)'] },
+    { title:'Lomo con batata', items:['Bife de lomo','Batata','Brócoli','Aceite de oliva'] },
+    { title:'Pollo con fideos', items:['Pechuga de pollo','Fideos secos (crudo)','Tomate','Aceite de oliva'] },
+  ],
+  preentreno: [
+    { title:'Pre-entreno rápido', items:['Banana','Pan integral','Miel'] },
+    { title:'Energía sostenida', items:['Avena arrollada','Banana','Yogur descremado'] },
+    { title:'Carbos simples', items:['Pan lactal blanco','Miel','Manzana'] },
+    { title:'Snack pre-entreno', items:['Banana','Yogur griego'] },
+    { title:'Tostada con fruta', items:['Pan integral','Mermelada','Naranja'] },
+  ],
+  postentreno: [
+    { title:'Recuperación proteica', items:['Yogur griego','Banana','Miel'] },
+    { title:'Huevos con tostada', items:['Huevo entero','Pan integral','Leche descremada (ml)'] },
+    { title:'Bowl de recuperación', items:['Yogur descremado','Granola','Frutilla'] },
+    { title:'Leche con avena', items:['Leche descremada (ml)','Banana','Avena arrollada'] },
+    { title:'Atún con tostada', items:['Atún al natural (lata)','Pan integral','Tomate'] },
+  ],
+  cena: [
+    { title:'Pollo con vegetales', items:['Pechuga de pollo','Zapallito','Espinaca','Aceite de oliva'] },
+    { title:'Pescado con ensalada', items:['Merluza','Papa','Lechuga','Aceite de oliva'] },
+    { title:'Carne con brócoli', items:['Nalga','Batata','Brócoli','Aceite de oliva'] },
+    { title:'Revuelto de huevos', items:['Huevo entero','Espinaca','Tomate','Pan integral'] },
+    { title:'Pollo con quinoa', items:['Pechuga de pollo','Quinoa (cruda)','Zapallito','Aceite de oliva'] },
+    { title:'Cazón al horno', items:['Tiburón / cazón','Papa','Morrón rojo','Aceite de oliva'] },
+  ],
+};
+
+const DEFAULT_GRAMS = {
+  'Pechuga de pollo':150,'Bife de cuadril':150,'Bife de lomo':150,'Nalga':150,'Peceto':150,
+  'Carne picada magra':150,'Merluza':180,'Tiburón / cazón':180,'Atún al natural (lata)':80,
+  'Huevo entero':110,
+  'Arroz integral (crudo)':70,'Arroz blanco (crudo)':70,'Fideos secos (crudo)':80,
+  'Quinoa (cruda)':70,'Avena arrollada':50,'Granola':40,'Pan integral':60,'Pan lactal blanco':60,
+  'Papa':150,'Batata':150,
+  'Brócoli':150,'Espinaca':100,'Zapallito':150,'Lechuga':80,'Tomate':100,
+  'Morrón rojo':100,'Morrón verde':100,
+  'Banana':100,'Manzana':150,'Naranja':150,'Mandarina':120,'Frutilla':150,'Kiwi':100,
+  'Yogur descremado':200,'Yogur griego':150,'Leche descremada (ml)':200,
+  'Palta (aguacate)':60,'Aceite de oliva':10,'Miel':15,'Mermelada':20,
+  'Almendras':30,'Nueces':30,'Castañas de cajú':30,'Semillas de chía':15,
+};
+
+function getGrams(name){ return DEFAULT_GRAMS[name]||100; }
+
+function calcTemplateMacros(items){
+  let kcal=0,prot=0,carb=0,fat=0;
+  items.forEach(name=>{
+    const food=FOOD_DB.find(f=>f.n===name);
+    if(!food)return;
+    const g=getGrams(name)/100;
+    kcal+=food.k*g; prot+=food.p*g; carb+=food.c*g; fat+=food.f*g;
+  });
+  return {kcal:Math.round(kcal),prot:+prot.toFixed(1),carb:+carb.toFixed(1),fat:+fat.toFixed(1)};
+}
+
+function scoreTemplate(template, rem){
+  const m=calcTemplateMacros(template.items);
+  const target=0.33;
+  const kcalDiff=Math.abs(m.kcal - rem.kcal*target);
+  const protDiff=Math.abs(m.prot - rem.prot*target)*4;
+  const carbDiff=Math.abs(m.carb - rem.carb*target);
+  const fatDiff =Math.abs(m.fat  - rem.fat *target)*2;
+  return kcalDiff+protDiff+carbDiff+fatDiff;
+}
+
 async function getAISuggestions(){
   if(!selectedMeal){showToast('Seleccioná una comida primero','err');return;}
   const meal=MEALS.find(m=>m.id===selectedMeal);
