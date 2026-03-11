@@ -1203,7 +1203,7 @@ Sugerí 3 opciones para: ${meal.name} (${meal.time})
 [{"title":"Nombre opción","items":["alimento 1 con cantidad","alimento 2 con cantidad"],"kcal":000,"prot":00,"carb":000,"fat":00}]`;
 
   try {
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
     const response=await fetch(url,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
