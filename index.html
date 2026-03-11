@@ -443,7 +443,7 @@ header {
       <!-- AI SUGGESTIONS -->
       <div class="panel ai-panel">
         <div class="ai-hdr">
-          <span class="ai-tag">IA</span>
+          <span class="ai-tag">LOCAL</span>
           <span class="ai-title">¿Qué como?</span>
         </div>
         <div class="sec-label">Elegí la comida</div>
@@ -452,7 +452,7 @@ header {
         <div class="ai-out" id="aiOut">
           <div class="ai-placeholder">
             <div class="ico">🍽️</div>
-            <p>Cargá lo que comiste y seleccioná una comida para recibir sugerencias según tus macros restantes.</p>
+            <p>Seleccioná una comida y tocá el botón. Las sugerencias se calculan al instante según tus macros restantes — sin internet ni clave.</p>
           </div>
         </div>
       </div>
@@ -466,7 +466,7 @@ header {
   <div class="modal-box" style="position:relative">
     <button class="modal-close" onclick="closeSettings()">✕</button>
     <div class="modal-title">⚙️ Configuración</div>
-    <div class="modal-sub">Para las sugerencias de IA usamos <strong>Google Gemini</strong> — es gratuito. Necesitás una API Key de Google AI Studio.</div>
+    <div class="modal-sub">Las sugerencias de comida funcionan 100% local, sin internet ni claves. Esta sección es solo para datos generales.</div>
 
     <div class="sec-label">API Key de Gemini (Google)</div>
     <div class="api-key-row">
@@ -1163,83 +1163,41 @@ function openWeightPanel(){
 //  AI SUGGESTIONS  (Gemini Flash — gratuito)
 // ══════════════════════════════════════════════════
 async function getAISuggestions(){
-  const apiKey=lsGet(APIKEY_KEY,'');
-  if(!apiKey){showToast('Configurá tu API Key de Gemini (⚙️)','err'); openSettings(); return;}
   if(!selectedMeal){showToast('Seleccioná una comida primero','err');return;}
   const meal=MEALS.find(m=>m.id===selectedMeal);
   const out=document.getElementById('aiOut');
-  out.innerHTML=`<div style="text-align:center;padding:20px 0;color:var(--muted)"><div class="loading-dots"><span></span><span></span><span></span></div><div style="margin-top:8px;font-size:0.78rem">Generando opciones...</div></div>`;
+  out.innerHTML=`<div style="text-align:center;padding:20px 0;color:var(--muted)"><div class="loading-dots"><span></span><span></span><span></span></div><div style="margin-top:8px;font-size:0.78rem">Calculando opciones...</div></div>`;
 
+  // Calculate remaining macros
   let total={kcal:0,prot:0,carb:0,fat:0};
   Object.values(state).forEach(foods=>{const s=sumMacros(foods);total.kcal+=s.kcal;total.prot+=s.prot;total.carb+=s.carb;total.fat+=s.fat;});
-  const rem={kcal:Math.round(TARGETS.kcal-total.kcal),prot:+(TARGETS.prot-total.prot).toFixed(1),carb:+(TARGETS.carb-total.carb).toFixed(1),fat:+(TARGETS.fat-total.fat).toFixed(1)};
-  const dow=new Date().getDay();
-  const tr=TRAINING[dow];
-  const dowNames=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  let eatenSummary='';
-  MEALS.forEach(m=>{
-    const foods=state[m.id];
-    if(foods&&foods.length>0){const t=sumMacros(foods);eatenSummary+=`\n- ${m.name}: ${foods.map(f=>f.name).join(', ')} (${Math.round(t.kcal)} kcal, ${t.prot.toFixed(1)}g P, ${t.carb.toFixed(1)}g HC, ${t.fat.toFixed(1)}g G)`;}
-  });
-  if(!eatenSummary)eatenSummary='\n- Nada registrado aún';
+  const rem={kcal:Math.max(0,TARGETS.kcal-total.kcal),prot:Math.max(0,TARGETS.prot-total.prot),carb:Math.max(0,TARGETS.carb-total.carb),fat:Math.max(0,TARGETS.fat-total.fat)};
 
-  const prompt=`Sos un nutricionista deportivo. Tu paciente es Nahuel, 28 años, 72.8kg, 171cm.
+  // Get templates for this meal, score and pick top 3
+  const templates=(MEAL_TEMPLATES[selectedMeal]||[]).map(t=>({
+    ...t,
+    macros:calcTemplateMacros(t.items),
+    score:scoreTemplate(t,rem)
+  }));
+  templates.sort((a,b)=>a.score-b.score);
+  const top3=templates.slice(0,3);
 
-PLAN NUTRICIONAL DIARIO: 2800 kcal | Proteínas: 147g (21%) | HC: 371g (53%) | Grasas: 81g (26%)
+  // Format as suggestions
+  const suggestions=top3.map(t=>({
+    title:t.title,
+    items:t.items.map(name=>{
+      const g=getGrams(name);
+      return `${name} (${g}g)`;
+    }),
+    kcal:t.macros.kcal,
+    prot:t.macros.prot,
+    carb:t.macros.carb,
+    fat:t.macros.fat,
+    _rawItems:t.items,
+    _rawGrams:t.items.map(getGrams)
+  }));
 
-ENTRENAMIENTO HOY (${dowNames[dow]}): ${tr.type==='swim'?'Natación 1:30hs (3500-4000m)':tr.type==='gym'?'Musculación 2hs':'Día de descanso'}
-
-LO QUE COMIÓ HOY:${eatenSummary}
-
-MACROS CONSUMIDOS: ${Math.round(total.kcal)} kcal | ${total.prot.toFixed(1)}g P | ${total.carb.toFixed(1)}g HC | ${total.fat.toFixed(1)}g G
-MACROS RESTANTES: ${rem.kcal} kcal | ${rem.prot}g P | ${rem.carb}g HC | ${rem.fat}g G
-
-Sugerí 3 opciones para: ${meal.name} (${meal.time})
-- Alimentos reales y accesibles en Argentina
-- Ajustá macros a lo que resta del día
-- Considerá el tipo de entrenamiento
-- Respondé ÚNICAMENTE con un array JSON válido, sin texto adicional, sin markdown, sin backticks:
-
-[{"title":"Nombre opción","items":["alimento 1 con cantidad","alimento 2 con cantidad"],"kcal":000,"prot":00,"carb":000,"fat":00}]`;
-
-  try {
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-    const response=await fetch(url,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:[{parts:[{text:prompt}]}],
-        generationConfig:{temperature:0.7,maxOutputTokens:1000}
-      })
-    });
-    if(!response.ok){
-      const err=await response.json().catch(()=>({}));
-      const msg=err.error?.message||'Error desconocido';
-      if(response.status===400&&msg.includes('API_KEY')){
-        out.innerHTML=`<div style="color:var(--red);font-size:0.8rem;padding:10px">❌ API Key inválida. Verificá en ⚙️ Configuración.</div>`;
-      } else {
-        out.innerHTML=`<div style="color:var(--red);font-size:0.8rem;padding:10px">Error ${response.status}: ${msg}</div>`;
-      }
-      return;
-    }
-    const data=await response.json();
-    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const clean=text.replace(/```json|```/g,'').trim();
-    let suggestions;
-    try{ suggestions=JSON.parse(clean); }
-    catch(e){
-      // try to extract JSON array from text
-      const match=clean.match(/\[[\s\S]*\]/);
-      if(match){ try{ suggestions=JSON.parse(match[0]); } catch(e2){} }
-    }
-    if(!suggestions){
-      out.innerHTML=`<div style="font-size:0.8rem;line-height:1.7;white-space:pre-wrap;color:var(--muted2)">${text}</div>`;
-      return;
-    }
-    renderSuggestions(suggestions,out);
-  } catch(e){
-    out.innerHTML=`<div style="color:var(--red);font-size:0.8rem;padding:10px">❌ Error de conexión. Revisá tu internet.</div>`;
-  }
+  setTimeout(()=>renderSuggestions(suggestions,out),400);
 }
 
 function renderSuggestions(suggestions,container){
@@ -1257,10 +1215,20 @@ function applySuggestion(idx){
   if(!window._lastSuggestions||!selectedMeal)return;
   const s=window._lastSuggestions[idx];
   if(!state[selectedMeal])state[selectedMeal]=[];
-  s.items.forEach((item,i)=>{
-    const fr=1/s.items.length;
-    state[selectedMeal].push({name:item,kcal:Math.round(s.kcal*fr),prot:+((s.prot*fr).toFixed(1)),carb:+((s.carb*fr).toFixed(1)),fat:+((s.fat*fr).toFixed(1))});
-  });
+  const rawItems=s._rawItems||[];
+  const rawGrams=s._rawGrams||[];
+  if(rawItems.length){
+    rawItems.forEach((name,i)=>{
+      const food=FOOD_DB.find(f=>f.n===name);
+      const g=(rawGrams[i]||100)/100;
+      if(food){
+        state[selectedMeal].push({name:name+' ('+( rawGrams[i]||100)+'g)',kcal:Math.round(food.k*g),prot:+(food.p*g).toFixed(1),carb:+(food.c*g).toFixed(1),fat:+(food.f*g).toFixed(1)});
+      } else {
+        const fr=1/rawItems.length;
+        state[selectedMeal].push({name,kcal:Math.round(s.kcal*fr),prot:+((s.prot*fr).toFixed(1)),carb:+((s.carb*fr).toFixed(1)),fat:+((s.fat*fr).toFixed(1))});
+      }
+    });
+  }
   saveState(); window._openMeal=selectedMeal; refresh();
   showToast('✅ '+s.title+' agregado a '+MEALS.find(m=>m.id===selectedMeal).name);
 }
