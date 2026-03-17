@@ -53,30 +53,30 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .nav-tab{flex:1;background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;padding:8px 4px;border-radius:8px;cursor:pointer;transition:all .2s;text-align:center;}
 .nav-tab.active{background:var(--card);color:var(--text);border:1px solid var(--border);}
 
-/* MACRO CARDS */
+/* MACRO CARDS — Modelo C: mini anillo */
 .macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
 @media(max-width:600px){.macro-grid{grid-template-columns:repeat(2,1fr);}}
-.mc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;position:relative;overflow:hidden;}
-.mc::after{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;border-radius:2px 2px 0 0;}
-.mc.kcal::after{background:var(--purple);}
-.mc.prot::after{background:var(--green);}
-.mc.carb::after{background:var(--cyan);}
-.mc.fat::after{background:var(--amber);}
-.mc-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px;}
-.mc-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.45rem;line-height:1;margin-bottom:3px;}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;transition:border-color .2s;}
+.mc:active{border-color:var(--border2);}
+.mc-ring{flex-shrink:0;}
+.mc-ring svg{display:block;}
+.mc-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.mc-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.25rem;line-height:1;}
 .mc.kcal .mc-val{color:var(--purple);}
 .mc.prot .mc-val{color:var(--green);}
 .mc.carb .mc-val{color:var(--cyan);}
 .mc.fat .mc-val{color:var(--amber);}
-.mc-sub{font-size:.7rem;color:var(--muted);margin-bottom:9px;}
-.mc-sub span{color:var(--muted2);}
-.bar-bg{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);}
-.mc.kcal .bar-fill{background:var(--purple);}
-.mc.prot .bar-fill{background:var(--green);}
-.mc.carb .bar-fill{background:var(--cyan);}
-.mc.fat .bar-fill{background:var(--amber);}
-.bar-fill.over{background:var(--red)!important;}
+.mc-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+.mc-sub{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mc-ring-track{fill:none;stroke:rgba(255,255,255,.08);}
+.mc-ring-fill{fill:none;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);}
+.mc-ring-pct{font-family:'Syne',sans-serif;font-weight:700;}
+.mc.kcal .mc-ring-fill{stroke:var(--purple);}
+.mc.prot .mc-ring-fill{stroke:var(--green);}
+.mc.carb .mc-ring-fill{stroke:var(--cyan);}
+.mc.fat .mc-ring-fill{stroke:var(--amber);}
+.mc-ring-fill.over{stroke:var(--red)!important;}
+@media(max-width:480px){.mc-sub{display:none;}.mc-val{font-size:1.05rem;}}
 
 /* LAYOUT */
 .main-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start;}
@@ -163,6 +163,9 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .meal-sel{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
 .mchip{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-size:.69rem;padding:5px 9px;border-radius:10px;cursor:pointer;transition:all .15s;position:relative;z-index:1;}
 .mchip.sel{background:rgba(61,214,140,.12);border-color:var(--green);color:var(--green);font-weight:600;}
+.tr-sel{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:2px;}
+.trchip{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-size:.69rem;padding:5px 9px;border-radius:10px;cursor:pointer;transition:all .15s;position:relative;z-index:1;}
+.trchip.sel{background:rgba(34,211,238,.12);border-color:var(--cyan);color:var(--cyan);font-weight:600;}
 .ai-out{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px;min-height:80px;font-size:.8rem;line-height:1.6;max-height:380px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .ai-placeholder{text-align:center;padding:16px 0;}
 .ai-placeholder .ico{font-size:1.8rem;margin-bottom:7px;}
@@ -319,10 +322,70 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
     </div>
 
     <div class="macro-grid">
-      <div class="mc kcal"><div class="mc-label">Calorías</div><div class="mc-val" id="mKcal">0</div><div class="mc-sub">de <span>2800</span> kcal</div><div class="bar-bg"><div class="bar-fill" id="bKcal" style="width:0%"></div></div></div>
-      <div class="mc prot"><div class="mc-label">Proteínas</div><div class="mc-val" id="mProt">0<small style="font-size:.7em">g</small></div><div class="mc-sub">de <span>147g</span></div><div class="bar-bg"><div class="bar-fill" id="bProt" style="width:0%"></div></div></div>
-      <div class="mc carb"><div class="mc-label">Hidratos</div><div class="mc-val" id="mCarb">0<small style="font-size:.7em">g</small></div><div class="mc-sub">de <span>371g</span></div><div class="bar-bg"><div class="bar-fill" id="bCarb" style="width:0%"></div></div></div>
-      <div class="mc fat"><div class="mc-label">Grasas</div><div class="mc-val" id="mFat">0<small style="font-size:.7em">g</small></div><div class="mc-sub">de <span>81g</span></div><div class="bar-bg"><div class="bar-fill" id="bFat" style="width:0%"></div></div></div>
+      <div class="mc kcal">
+        <div class="mc-ring">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle class="mc-ring-track" cx="26" cy="26" r="20" stroke-width="5"/>
+            <circle class="mc-ring-fill" id="rKcal" cx="26" cy="26" r="20" stroke-width="5"
+              stroke-dasharray="125.6" stroke-dashoffset="125.6" transform="rotate(-90 26 26)"/>
+            <text id="pKcal" class="mc-ring-pct" x="26" y="30" text-anchor="middle"
+              font-size="10" fill="#a78bfa">0%</text>
+          </svg>
+        </div>
+        <div class="mc-info">
+          <div class="mc-val" id="mKcal">0</div>
+          <div class="mc-label">Calorías</div>
+          <div class="mc-sub">de 2800 kcal</div>
+        </div>
+      </div>
+      <div class="mc prot">
+        <div class="mc-ring">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle class="mc-ring-track" cx="26" cy="26" r="20" stroke-width="5"/>
+            <circle class="mc-ring-fill" id="rProt" cx="26" cy="26" r="20" stroke-width="5"
+              stroke-dasharray="125.6" stroke-dashoffset="125.6" transform="rotate(-90 26 26)"/>
+            <text id="pProt" class="mc-ring-pct" x="26" y="30" text-anchor="middle"
+              font-size="10" fill="#3dd68c">0%</text>
+          </svg>
+        </div>
+        <div class="mc-info">
+          <div class="mc-val" id="mProt">0g</div>
+          <div class="mc-label">Proteínas</div>
+          <div class="mc-sub">de 147g</div>
+        </div>
+      </div>
+      <div class="mc carb">
+        <div class="mc-ring">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle class="mc-ring-track" cx="26" cy="26" r="20" stroke-width="5"/>
+            <circle class="mc-ring-fill" id="rCarb" cx="26" cy="26" r="20" stroke-width="5"
+              stroke-dasharray="125.6" stroke-dashoffset="125.6" transform="rotate(-90 26 26)"/>
+            <text id="pCarb" class="mc-ring-pct" x="26" y="30" text-anchor="middle"
+              font-size="10" fill="#22d3ee">0%</text>
+          </svg>
+        </div>
+        <div class="mc-info">
+          <div class="mc-val" id="mCarb">0g</div>
+          <div class="mc-label">Hidratos</div>
+          <div class="mc-sub">de 371g</div>
+        </div>
+      </div>
+      <div class="mc fat">
+        <div class="mc-ring">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle class="mc-ring-track" cx="26" cy="26" r="20" stroke-width="5"/>
+            <circle class="mc-ring-fill" id="rFat" cx="26" cy="26" r="20" stroke-width="5"
+              stroke-dasharray="125.6" stroke-dashoffset="125.6" transform="rotate(-90 26 26)"/>
+            <text id="pFat" class="mc-ring-pct" x="26" y="30" text-anchor="middle"
+              font-size="10" fill="#fbbf24">0%</text>
+          </svg>
+        </div>
+        <div class="mc-info">
+          <div class="mc-val" id="mFat">0g</div>
+          <div class="mc-label">Grasas</div>
+          <div class="mc-sub">de 81g</div>
+        </div>
+      </div>
     </div>
 
     <div class="main-grid">
@@ -357,7 +420,14 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <div class="ai-hdr"><span class="ai-tag">SUGERENCIAS</span><span class="ai-title">¿Qué como?</span></div>
           <div class="sec-label">Elegí la comida</div>
           <div class="meal-sel" id="mealSel"></div>
-          <button class="btn ai" style="width:100%;margin-bottom:9px;z-index:1;position:relative" onclick="getAISuggestions()">✨ Sugerirme opciones</button>
+          <div class="sec-label" style="margin-top:10px">Tipo de entrenamiento</div>
+          <div class="tr-sel" id="trSel">
+            <span class="trchip sel" data-tr="auto" onclick="selectTr('auto')">🗓 Auto</span>
+            <span class="trchip" data-tr="swim" onclick="selectTr('swim')">🏊 Natación</span>
+            <span class="trchip" data-tr="gym" onclick="selectTr('gym')">🏋️ Musculación</span>
+            <span class="trchip" data-tr="rest" onclick="selectTr('rest')">😴 Descanso</span>
+          </div>
+          <button class="btn ai" style="width:100%;margin-bottom:9px;z-index:1;position:relative;margin-top:10px" onclick="getAISuggestions()">✨ Sugerirme opciones</button>
           <div class="ai-out" id="aiOut">
             <div class="ai-placeholder"><div class="ico">🍽️</div><p>Seleccioná una comida y tocá el botón. Las opciones se calculan según tus macros restantes.</p></div>
           </div>
@@ -786,6 +856,7 @@ let state={};
 let weightData=[];
 let recipesData=[];
 let selectedMeal=null;
+let selectedTr='auto'; // 'auto','swim','gym','rest'
 let currentTab='tracker';
 
 function loadState(d){state=lsGet(dateKey(d),{});}
@@ -947,15 +1018,30 @@ function renderMealSelector(){
 function renderMacros(){
   let total={kcal:0,prot:0,carb:0,fat:0};
   Object.values(state).forEach(foods=>{const s=sumMacros(foods);total.kcal+=s.kcal;total.prot+=s.prot;total.carb+=s.carb;total.fat+=s.fat;});
-  const set=(id,val,target,bid)=>{
-    document.getElementById(id).innerHTML=Math.round(val)+(id!=='mKcal'?'<small style="font-size:.7em">g</small>':'');
-    const bar=document.getElementById(bid);bar.style.width=Math.min((val/target)*100,100)+'%';
-    bar.className='bar-fill'+(val>target?' over':'');
+
+  const CIRCUMFERENCE=125.6; // 2 * pi * r(20)
+  const setRing=(valId,ringId,pctId,val,target,unit)=>{
+    const pct=Math.min(val/target,1);
+    const over=val>target;
+    // value text
+    const valEl=document.getElementById(valId);
+    if(valEl)valEl.textContent=Math.round(val)+(unit||'');
+    // ring arc
+    const ring=document.getElementById(ringId);
+    if(ring){
+      ring.style.strokeDashoffset=CIRCUMFERENCE-(CIRCUMFERENCE*pct);
+      ring.setAttribute('class','mc-ring-fill'+(over?' over':''));
+    }
+    // percentage text
+    const pctEl=document.getElementById(pctId);
+    if(pctEl)pctEl.textContent=Math.round(pct*100)+'%';
   };
-  set('mKcal',total.kcal,TARGETS.kcal,'bKcal');
-  set('mProt',total.prot,TARGETS.prot,'bProt');
-  set('mCarb',total.carb,TARGETS.carb,'bCarb');
-  set('mFat',total.fat,TARGETS.fat,'bFat');
+
+  setRing('mKcal','rKcal','pKcal',total.kcal,TARGETS.kcal,'');
+  setRing('mProt','rProt','pProt',total.prot,TARGETS.prot,'g');
+  setRing('mCarb','rCarb','pCarb',total.carb,TARGETS.carb,'g');
+  setRing('mFat','rFat','pFat',total.fat,TARGETS.fat,'g');
+
   const r={kcal:TARGETS.kcal-total.kcal,prot:TARGETS.prot-total.prot,carb:TARGETS.carb-total.carb,fat:TARGETS.fat-total.fat};
   document.getElementById('sKcal').textContent=Math.round(r.kcal);
   document.getElementById('sProt').textContent=r.prot.toFixed(1)+'g';
@@ -1006,6 +1092,13 @@ function removeFood(mealId,idx){
 }
 
 function selectMeal(id){selectedMeal=id;renderMealSelector();}
+
+function selectTr(tr){
+  selectedTr=tr;
+  document.querySelectorAll('.trchip').forEach(el=>{
+    el.classList.toggle('sel', el.dataset.tr===tr);
+  });
+}
 
 function switchDate(d){
   currentDate=d;loadState(d);
@@ -1138,8 +1231,16 @@ function getAISuggestions(){
     fat:Math.max(0,TARGETS.fat-total.fat)
   };
 
-  const dow=new Date().getDay();
-  const trType=TRAINING[dow].type;
+  // Use manually selected training type, or auto-detect from selected date
+  let trType, dow;
+  if(selectedTr && selectedTr!=='auto'){
+    trType=selectedTr;
+    dow=new Date(currentDate+'T12:00:00').getDay();
+  } else {
+    const selDate=new Date(currentDate+'T12:00:00');
+    dow=selDate.getDay();
+    trType=TRAINING[dow].type;
+  }
 
   // Get templates — filter by tipo if applicable, then shuffle and score
   let templates=(MEAL_TEMPLATES[selectedMeal]||[]).filter(t=>{
@@ -1170,15 +1271,19 @@ function getAISuggestions(){
     };
   });
 
-  setTimeout(()=>renderSuggestions(suggestions,out),350);
+  const trLabel=selectedTr!=='auto'
+    ? {swim:'🏊 Natación',gym:'🏋️ Musculación',rest:'😴 Descanso'}[selectedTr]
+    : TRAINING[dow].label;
+  setTimeout(()=>renderSuggestions(suggestions,out,trLabel),350);
 }
 
-function renderSuggestions(suggestions,container){
+function renderSuggestions(suggestions,container,trLabel){
   if(!suggestions.length){
     container.innerHTML=`<div class="ai-placeholder"><div class="ico">🤔</div><p>No hay opciones para esta comida todavía.</p></div>`;
     return;
   }
-  container.innerHTML=suggestions.map((s,i)=>`
+  const labelHtml=trLabel?`<div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;text-align:center">Sugerencias para día de ${trLabel}</div>`:'';
+  container.innerHTML=labelHtml+suggestions.map((s,i)=>`
     <div class="sug-card" onclick="applySuggestion(${i})">
       <div class="sug-title">${['🥇','🥈','🥉'][i]||'✅'} ${s.title}</div>
       <div class="sug-items">${s.items.join(' · ')}</div>
@@ -1627,17 +1732,17 @@ function showToast(msg,type='ok'){
 //  INIT
 // ══════════════════════════════════════════════════
 function init(){
-  document.getElementById('wDate').value=getTodayStr();
-  renderHeader();
-  loadState(currentDate);
-  loadWeights();
-  loadRecipes();
-  renderMeals();
-  renderMacros();
-  renderMealSelector();
-  renderWeek();
-  renderWeights();
-  checkWeightReminder();
+  try{document.getElementById('wDate').value=getTodayStr();}catch(e){}
+  try{renderHeader();}catch(e){console.error('renderHeader',e);}
+  try{loadState(currentDate);}catch(e){}
+  try{loadWeights();}catch(e){}
+  try{loadRecipes();}catch(e){}
+  try{renderMeals();}catch(e){console.error('renderMeals',e);}
+  try{renderMacros();}catch(e){console.error('renderMacros',e);}
+  try{renderMealSelector();}catch(e){console.error('renderMealSelector',e);}
+  try{renderWeek();}catch(e){console.error('renderWeek',e);}
+  try{renderWeights();}catch(e){console.error('renderWeights',e);}
+  try{checkWeightReminder();}catch(e){}
 }
 
 init();
