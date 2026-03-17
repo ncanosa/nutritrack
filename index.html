@@ -68,6 +68,12 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .mc.fat .mc-val{color:var(--amber);}
 .mc-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
 .mc-sub{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mc-resta{font-size:.62rem;color:var(--muted2);white-space:nowrap;font-weight:500;}
+.mc-resta span{font-weight:700;}
+.mc.kcal .mc-resta span{color:var(--purple);}
+.mc.prot .mc-resta span{color:var(--green);}
+.mc.carb .mc-resta span{color:var(--cyan);}
+.mc.fat .mc-resta span{color:var(--amber);}
 .mc-ring-track{fill:none;stroke:rgba(255,255,255,.08);}
 .mc-ring-fill{fill:none;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);}
 .mc-ring-pct{font-family:'Syne',sans-serif;font-weight:700;}
@@ -188,10 +194,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .sug-macro.f{background:rgba(251,191,36,.15);color:var(--amber);}
 
 /* STATS */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.stat{background:var(--bg3);border-radius:10px;padding:11px;}
-.stat-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;}
-.stat-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;}
+
 
 /* WEEK NAV */
 .week-row{display:flex;justify-content:space-between;gap:4px;}
@@ -336,6 +339,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <div class="mc-val" id="mKcal">0</div>
           <div class="mc-label">Calorías</div>
           <div class="mc-sub">de 2800 kcal</div>
+          <div class="mc-resta">resta: <span id="sKcal">2800</span></div>
         </div>
       </div>
       <div class="mc prot">
@@ -352,6 +356,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <div class="mc-val" id="mProt">0g</div>
           <div class="mc-label">Proteínas</div>
           <div class="mc-sub">de 147g</div>
+          <div class="mc-resta">resta: <span id="sProt">147g</span></div>
         </div>
       </div>
       <div class="mc carb">
@@ -368,6 +373,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <div class="mc-val" id="mCarb">0g</div>
           <div class="mc-label">Hidratos</div>
           <div class="mc-sub">de 371g</div>
+          <div class="mc-resta">resta: <span id="sCarb">371g</span></div>
         </div>
       </div>
       <div class="mc fat">
@@ -384,6 +390,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <div class="mc-val" id="mFat">0g</div>
           <div class="mc-label">Grasas</div>
           <div class="mc-sub">de 81g</div>
+          <div class="mc-resta">resta: <span id="sFat">81g</span></div>
         </div>
       </div>
     </div>
@@ -394,15 +401,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
         <div class="meals-col" id="mealsCol"></div>
       </div>
       <div class="right-col">
-        <div class="panel">
-          <div class="sec-label">Resta para hoy</div>
-          <div class="stats-grid">
-            <div class="stat"><div class="stat-label">Kcal</div><div class="stat-val" style="color:var(--purple)" id="sKcal">2800</div></div>
-            <div class="stat"><div class="stat-label">Proteínas</div><div class="stat-val" style="color:var(--green)" id="sProt">147g</div></div>
-            <div class="stat"><div class="stat-label">Hidratos</div><div class="stat-val" style="color:var(--cyan)" id="sCarb">371g</div></div>
-            <div class="stat"><div class="stat-label">Grasas</div><div class="stat-val" style="color:var(--amber)" id="sFat">81g</div></div>
-          </div>
-        </div>
+        
         <div class="panel" id="weightPanel">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
             <div><div class="sec-label" style="margin:0">⚖️ Registro de Peso</div><div style="font-size:.68rem;color:var(--muted);margin-top:2px">Cada 2 semanas</div></div>
@@ -1043,10 +1042,18 @@ function renderMacros(){
   setRing('mFat','rFat','pFat',total.fat,TARGETS.fat,'g');
 
   const r={kcal:TARGETS.kcal-total.kcal,prot:TARGETS.prot-total.prot,carb:TARGETS.carb-total.carb,fat:TARGETS.fat-total.fat};
-  document.getElementById('sKcal').textContent=Math.round(r.kcal);
-  document.getElementById('sProt').textContent=r.prot.toFixed(1)+'g';
-  document.getElementById('sCarb').textContent=r.carb.toFixed(1)+'g';
-  document.getElementById('sFat').textContent=r.fat.toFixed(1)+'g';
+  const setResta=(id,val,unit)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const v=unit?val.toFixed(1)+unit:Math.round(val)+'';
+    el.textContent=v;
+    // red tint if over target
+    el.style.color=val<0?'var(--red)':'';
+  };
+  setResta('sKcal',r.kcal,'');
+  setResta('sProt',r.prot,'g');
+  setResta('sCarb',r.carb,'g');
+  setResta('sFat',r.fat,'g');
 }
 
 // ══════════════════════════════════════════════════
@@ -1249,16 +1256,12 @@ function getAISuggestions(){
     return t.tipo===trType||(trType==='rest'&&t.tipo==='gym');
   });
 
-  // Shuffle to add variety (Fisher-Yates)
+  // Full random shuffle (Fisher-Yates) — pick any 3 from the full list
   for(let i=templates.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [templates[i],templates[j]]=[templates[j],templates[i]];
   }
-
-  // Score and sort — but only from shuffled subset of max 10 to keep variety
-  const subset=templates.slice(0,Math.min(templates.length,10));
-  subset.sort((a,b)=>scoreTemplate(a,rem)-scoreTemplate(b,rem));
-  const top3=subset.slice(0,3);
+  const top3=templates.slice(0,3);
 
   const suggestions=top3.map(t=>{
     const macros=calcTemplateMacros(t.items,t.grams);
