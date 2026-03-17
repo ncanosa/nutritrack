@@ -205,6 +205,9 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .day-btn.has-data .day-dot{opacity:1;}
 .reset-btn{background:none;border:none;color:var(--muted);font-size:.7rem;cursor:pointer;padding:4px 8px;border-radius:6px;font-family:'DM Sans',sans-serif;}
 .reset-btn:active{color:var(--red);}
+.week-nav-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-size:1.1rem;width:26px;height:26px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s;padding:0;}
+.week-nav-btn:active{background:var(--border);color:var(--text);}
+.week-nav-btn:disabled{opacity:.3;cursor:default;}
 
 /* WEIGHT */
 .weight-reminder{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08));border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;animation:fadeIn .4s ease;}
@@ -318,7 +321,11 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 
     <div class="panel" style="margin-bottom:14px;padding:12px 14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-        <span class="sec-label" style="margin:0">Semana actual</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="week-nav-btn" onclick="shiftWeek(-1)" title="Semana anterior">‹</button>
+          <span class="sec-label" style="margin:0" id="weekLabel">Semana actual</span>
+          <button class="week-nav-btn" onclick="shiftWeek(1)" id="weekNextBtn" title="Semana siguiente">›</button>
+        </div>
         <button class="reset-btn" onclick="resetDay()">🗑 Resetear día</button>
       </div>
       <div class="week-row" id="weekRow"></div>
@@ -857,6 +864,7 @@ let recipesData=[];
 let selectedMeal=null;
 let selectedTr='auto'; // 'auto','swim','gym','rest'
 let currentTab='tracker';
+let weekOffset=0; // 0=current week, -1=last week, etc.
 
 function loadState(d){state=lsGet(dateKey(d),{});}
 function saveState(){lsSet(dateKey(currentDate),state);}
@@ -900,7 +908,7 @@ function renderWeek(){
   const dow=today.getDay();
   const diffToMon=dow===0?-6:1-dow;
   const monday=new Date(today);
-  monday.setDate(today.getDate()+diffToMon);
+  monday.setDate(today.getDate()+diffToMon+(weekOffset*7));
   const row=document.getElementById('weekRow');
   row.innerHTML='';
   for(let i=0;i<7;i++){
@@ -918,6 +926,24 @@ function renderWeek(){
     btn.onclick=()=>switchDate(str);
     row.appendChild(btn);
   }
+  // Update week label
+  const label=document.getElementById('weekLabel');
+  if(label){
+    if(weekOffset===0)label.textContent='Semana actual';
+    else if(weekOffset===-1)label.textContent='Semana pasada';
+    else if(weekOffset<-1)label.textContent=`Hace ${Math.abs(weekOffset)} semanas`;
+    else label.textContent=`En ${weekOffset} semana${weekOffset>1?'s':''}`;
+  }
+  // Disable next button if current week
+  const nextBtn=document.getElementById('weekNextBtn');
+  if(nextBtn) nextBtn.disabled=weekOffset>=0;
+}
+
+function shiftWeek(dir){
+  // Only allow going back (no future weeks)
+  if(weekOffset+dir>0)return;
+  weekOffset+=dir;
+  renderWeek();
 }
 
 // ══════════════════════════════════════════════════
