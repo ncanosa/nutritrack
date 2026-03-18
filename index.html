@@ -260,6 +260,39 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .avg-vs.avg-low{color:var(--amber);}
 .avg-vs.avg-over{color:var(--red);}
 
+/* ENERGY STATE */
+.energy-panel{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;}
+.energy-row{display:flex;gap:6px;}
+.energy-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;transition:all .15s;}
+.energy-btn.esel-low{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.4);}
+.energy-btn.esel-ok{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.4);}
+.energy-btn.esel-high{background:rgba(61,214,140,.1);border-color:rgba(61,214,140,.4);}
+.energy-ico{font-size:1.1rem;display:block;margin-bottom:3px;}
+.energy-lbl{font-size:.62rem;color:var(--muted2);font-weight:600;}
+.energy-week{display:flex;gap:4px;margin-top:8px;}
+.ew-day{flex:1;background:var(--bg3);border-radius:7px;padding:5px 3px;text-align:center;}
+.ew-day.ew-current{background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.3);}
+.ew-name{font-size:.56rem;color:var(--muted);font-weight:700;display:block;}
+.ew-ico{font-size:.8rem;display:block;margin-top:2px;}
+
+/* FAVORITES */
+.food-del-row{display:flex;gap:4px;flex-shrink:0;}
+.food-fav{background:none;border:none;cursor:pointer;font-size:.9rem;padding:3px 5px;border-radius:6px;color:var(--muted);transition:all .15s;}
+.food-fav.starred{color:var(--amber);}
+.fav-chips-wrap{margin-top:8px;}
+.fav-chip{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--amber);font-size:.68rem;padding:4px 9px;border-radius:10px;cursor:pointer;display:inline-block;margin:0 4px 4px 0;}
+
+/* MOVE FOOD */
+.food-move{background:none;border:none;cursor:pointer;font-size:.85rem;padding:3px 5px;border-radius:6px;color:var(--muted);transition:all .15s;}
+.food-move:active{color:var(--cyan);}
+.move-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;display:flex;align-items:flex-end;justify-content:center;}
+.move-modal-overlay.hidden{display:none;}
+.move-modal{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 18px calc(20px + var(--safe-bot));width:100%;max-width:480px;}
+.move-modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px;}
+.move-meal-option{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:.82rem;transition:border-color .15s;}
+.move-meal-option:active{border-color:var(--cyan);}
+.move-meal-option:last-child{margin-bottom:0;}
+
 /* WEIGHT */
 .weight-reminder{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08));border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;animation:fadeIn .4s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
@@ -378,9 +411,30 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <span class="sec-label" style="margin:0" id="weekLabel">Semana actual</span>
           <button class="week-nav-btn" onclick="shiftWeek(1)" id="weekNextBtn" title="Semana siguiente">›</button>
         </div>
-        <button class="reset-btn" onclick="resetDay()">🗑 Resetear día</button>
+        <div style="display:flex;gap:6px">
+          <button class="reset-btn" onclick="duplicateYesterday()" title="Copiar comidas de ayer">📋 Copiar ayer</button>
+          <button class="reset-btn" onclick="resetDay()">🗑 Resetear</button>
+        </div>
       </div>
       <div class="week-row" id="weekRow"></div>
+      <div class="energy-panel">
+        <div class="sec-label" style="margin-bottom:7px">¿Cómo te sentís hoy?</div>
+        <div class="energy-row">
+          <div class="energy-btn" id="ebtn-low" onclick="setEnergy('low')">
+            <span class="energy-ico">😴</span>
+            <span class="energy-lbl">Bajo</span>
+          </div>
+          <div class="energy-btn" id="ebtn-ok" onclick="setEnergy('ok')">
+            <span class="energy-ico">😐</span>
+            <span class="energy-lbl">Normal</span>
+          </div>
+          <div class="energy-btn" id="ebtn-high" onclick="setEnergy('high')">
+            <span class="energy-ico">⚡</span>
+            <span class="energy-lbl">Alto</span>
+          </div>
+        </div>
+        <div class="energy-week" id="energyWeek"></div>
+      </div>
     </div>
 
     <div class="macro-grid">
@@ -547,6 +601,13 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
     <div class="recipe-list" id="recipeList"></div>
   </div>
 
+</div>
+
+<div class="move-modal-overlay hidden" id="moveFoodModal" onclick="closeMoveModal(event)">
+  <div class="move-modal">
+    <div class="move-modal-title">Mover a otra comida</div>
+    <div id="moveMealOptions"></div>
+  </div>
 </div>
 
 <div class="modal-overlay hidden" id="settingsModal" onclick="closeSettingsOutside(event)">
@@ -1063,8 +1124,10 @@ function renderMeals(){
 
 function renderFoodList(mealId,foods){
   if(!foods.length)return'<div class="no-foods">Sin alimentos cargados</div>';
-  return`<div class="food-list">${foods.map((f,i)=>`
-    <div class="food-row">
+  const favs=lsGet('nt:favs',{});
+  return`<div class="food-list">${foods.map((f,i)=>{
+    const isFav=!!favs[f.name];
+    return`<div class="food-row">
       <span class="food-name">${f.name}</span>
       <div class="food-macros">
         <span style="color:var(--purple)">${Math.round(f.kcal)}kcal</span>
@@ -1072,8 +1135,13 @@ function renderFoodList(mealId,foods){
         <span style="color:var(--cyan)">${f.carb.toFixed(1)}g</span>
         <span style="color:var(--amber)">${f.fat.toFixed(1)}g</span>
       </div>
-      <button class="food-del" onclick="removeFood('${mealId}',${i})">✕</button>
-    </div>`).join('')}</div>`;
+      <div class="food-del-row">
+        <button class="food-fav${isFav?' starred':''}" onclick="toggleFav('${mealId}',${i})" title="${isFav?'Quitar favorito':'Agregar favorito'}">${isFav?'⭐':'☆'}</button>
+        <button class="food-move" onclick="openMoveModal('${mealId}',${i})" title="Mover a otra comida">↕</button>
+        <button class="food-del" onclick="removeFood('${mealId}',${i})">✕</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function renderAddForm(mealId){
@@ -1111,8 +1179,20 @@ function renderAddForm(mealId){
 
 function renderQuickAdd(mealId){
   const foods=QUICK_FOODS[mealId]||[];
-  if(!foods.length)return'';
-  return`<div class="quick-add"><div class="quick-label">Agregar rápido</div><div class="chips">${foods.map((f,i)=>`<span class="chip" onclick="quickAdd('${mealId}',${i})">${f.name}</span>`).join('')}</div></div>`;
+  const favs=lsGet('nt:favs',{});
+  const favList=Object.values(favs);
+  let html='';
+  if(favList.length){
+    html+=`<div class="quick-add"><div class="quick-label">⭐ Favoritos</div><div class="chips">${
+      favList.map(f=>`<span class="fav-chip" onclick="addFavFood('${mealId}','${f.name.replace(/'/g,"\'")}',${f.kcal},${f.prot},${f.carb},${f.fat})">${f.name}</span>`).join('')
+    }</div></div>`;
+  }
+  if(foods.length){
+    html+=`<div class="quick-add"><div class="quick-label">Agregar rápido</div><div class="chips">${
+      foods.map((f,i)=>`<span class="chip" onclick="quickAdd('${mealId}',${i})">${f.name}</span>`).join('')
+    }</div></div>`;
+  }
+  return html;
 }
 
 function renderMealSelector(){
@@ -1215,6 +1295,8 @@ function selectTr(tr){
 function switchDate(d){
   currentDate=d;loadState(d);
   renderMeals();renderMacros();renderWeek();
+  try{renderEnergyButtons();}catch(e){}
+  try{renderEnergyWeek();}catch(e){}
   document.getElementById('aiOut').innerHTML=`<div class="ai-placeholder"><div class="ico">🍽️</div><p>Seleccioná una comida para recibir sugerencias.</p></div>`;
 }
 
@@ -2173,6 +2255,149 @@ function clearAllData(){
 }
 
 // ══════════════════════════════════════════════════
+//  ENERGY STATE
+// ══════════════════════════════════════════════════
+const ENERGY_KEY='nt:energy';
+const ENERGY_ICONS={low:'😴',ok:'😐',high:'⚡'};
+const ENERGY_CLASSES={low:'esel-low',ok:'esel-ok',high:'esel-high'};
+
+function loadEnergyForDate(d){
+  const data=lsGet(ENERGY_KEY,{});
+  return data[d]||null;
+}
+
+function setEnergy(level){
+  const data=lsGet(ENERGY_KEY,{});
+  if(data[currentDate]===level){
+    delete data[currentDate]; // toggle off
+  } else {
+    data[currentDate]=level;
+  }
+  lsSet(ENERGY_KEY,data);
+  renderEnergyButtons();
+  renderEnergyWeek();
+  showToast(data[currentDate]?'Energía: '+{low:'Baja',ok:'Normal',high:'Alta'}[data[currentDate]]:'Energía eliminada');
+}
+
+function renderEnergyButtons(){
+  const current=loadEnergyForDate(currentDate);
+  ['low','ok','high'].forEach(lv=>{
+    const btn=document.getElementById('ebtn-'+lv);
+    if(!btn)return;
+    btn.className='energy-btn'+(current===lv?' '+ENERGY_CLASSES[lv]:'');
+  });
+}
+
+function renderEnergyWeek(){
+  const container=document.getElementById('energyWeek');
+  if(!container)return;
+  const dayLabels={1:'L',2:'M',3:'X',4:'J',5:'V',6:'S',0:'D'};
+  const today=new Date();
+  const dow=today.getDay();
+  const diffToMon=dow===0?-6:1-dow;
+  const monday=new Date(today);
+  monday.setDate(today.getDate()+diffToMon+(weekOffset*7));
+  const energyData=lsGet(ENERGY_KEY,{});
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const str=d.toISOString().slice(0,10);
+    const isCurrent=str===currentDate;
+    const ev=energyData[str];
+    html+=`<div class="ew-day${isCurrent?' ew-current':''}">
+      <span class="ew-name">${dayLabels[d.getDay()]}</span>
+      <span class="ew-ico">${ev?ENERGY_ICONS[ev]:'·'}</span>
+    </div>`;
+  }
+  container.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════
+//  FAVORITES
+// ══════════════════════════════════════════════════
+function toggleFav(mealId,foodIdx){
+  const food=state[mealId]&&state[mealId][foodIdx];
+  if(!food)return;
+  const favs=lsGet('nt:favs',{});
+  if(favs[food.name]){
+    delete favs[food.name];
+    showToast('☆ Eliminado de favoritos');
+  } else {
+    favs[food.name]={name:food.name,kcal:food.kcal,prot:food.prot,carb:food.carb,fat:food.fat};
+    showToast('⭐ Agregado a favoritos');
+  }
+  lsSet('nt:favs',favs);
+  window._openMeal=mealId;
+  refresh();
+}
+
+function addFavFood(mealId,name,kcal,prot,carb,fat){
+  if(!state[mealId])state[mealId]=[];
+  state[mealId].push({name,kcal,prot,carb,fat});
+  saveState();window._openMeal=mealId;refresh();
+  showToast('✅ '+name+' agregado');
+}
+
+// ══════════════════════════════════════════════════
+//  MOVE FOOD
+// ══════════════════════════════════════════════════
+let _moveFoodMeal=null;
+let _moveFoodIdx=null;
+
+function openMoveModal(mealId,foodIdx){
+  _moveFoodMeal=mealId;
+  _moveFoodIdx=foodIdx;
+  const food=state[mealId]&&state[mealId][foodIdx];
+  if(!food)return;
+  const opts=document.getElementById('moveMealOptions');
+  if(!opts)return;
+  opts.innerHTML=MEALS.filter(m=>m.id!==mealId).map(m=>`
+    <div class="move-meal-option" onclick="executeMove('${m.id}')">
+      <span style="font-size:1.2rem">${m.icon}</span>
+      <div>
+        <div style="font-weight:600">${m.name}</div>
+        <div style="font-size:.68rem;color:var(--muted)">${m.time}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('moveFoodModal').classList.remove('hidden');
+}
+
+function closeMoveModal(e){
+  if(!e||e.target.id==='moveFoodModal')
+    document.getElementById('moveFoodModal').classList.add('hidden');
+}
+
+function executeMove(targetMealId){
+  if(_moveFoodMeal===null||_moveFoodIdx===null)return;
+  const food=state[_moveFoodMeal]&&state[_moveFoodMeal][_moveFoodIdx];
+  if(!food)return;
+  state[_moveFoodMeal].splice(_moveFoodIdx,1);
+  if(!state[targetMealId])state[targetMealId]=[];
+  state[targetMealId].push(food);
+  saveState();
+  document.getElementById('moveFoodModal').classList.add('hidden');
+  window._openMeal=targetMealId;
+  refresh();
+  showToast('↕ '+food.name+' movido a '+MEALS.find(m=>m.id===targetMealId).name);
+  _moveFoodMeal=null;_moveFoodIdx=null;
+}
+
+// ══════════════════════════════════════════════════
+//  DUPLICATE DAY
+// ══════════════════════════════════════════════════
+function duplicateYesterday(){
+  const yesterday=new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+  const yStr=yesterday.toISOString().slice(0,10);
+  const yState=lsGet(dateKey(yStr),{});
+  if(!Object.keys(yState).length){showToast('Ayer no tenés datos cargados','err');return;}
+  if(!confirm('¿Copiar las comidas de ayer a hoy? Esto reemplaza lo que tenés cargado hoy.'))return;
+  state=JSON.parse(JSON.stringify(yState)); // deep copy
+  saveState();refresh();
+  showToast('✅ Comidas de ayer copiadas a hoy');
+}
+
+// ══════════════════════════════════════════════════
 //  UTILS
 // ══════════════════════════════════════════════════
 function sumMacros(foods){
@@ -2206,6 +2431,8 @@ function init(){
   try{renderWeek();}catch(e){console.error('renderWeek',e);}
   try{renderWeights();}catch(e){console.error('renderWeights',e);}
   try{checkWeightReminder();}catch(e){}
+  try{renderEnergyButtons();}catch(e){}
+  try{renderEnergyWeek();}catch(e){}
 }
 
 init();
