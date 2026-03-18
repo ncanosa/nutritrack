@@ -209,6 +209,57 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .week-nav-btn:active{background:var(--border);color:var(--text);}
 .week-nav-btn:disabled{opacity:.3;cursor:default;}
 
+/* HISTORY */
+.hist-days-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+.hist-day-btn{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 7px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:70px;flex-shrink:0;cursor:pointer;transition:all .2s;-webkit-user-select:none;user-select:none;}
+.hist-day-btn.hok{border-top:2.5px solid var(--green);}
+.hist-day-btn.hlow{border-top:2.5px solid var(--amber);}
+.hist-day-btn.hover{border-top:2.5px solid var(--red);}
+.hist-day-btn.hempty{opacity:.4;}
+.hist-day-btn.hactive{border-color:var(--cyan);background:rgba(34,211,238,.06);}
+.hist-day-name{font-size:.62rem;font-weight:700;color:var(--muted2);letter-spacing:.5px;}
+.hist-day-icon{font-size:.9rem;}
+.hist-day-kcal{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:var(--text);}
+.hist-day-pct{font-size:.62rem;color:var(--muted);}
+.hist-detail-wrap{margin-top:12px;background:var(--bg3);border-radius:12px;padding:13px;border:1px solid var(--border2);}
+.hist-detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.hist-detail-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);}
+.hist-status{font-size:.66rem;padding:3px 8px;border-radius:8px;font-weight:600;}
+.hist-status.ok{background:rgba(61,214,140,.15);color:var(--green);}
+.hist-status.low{background:rgba(251,191,36,.15);color:var(--amber);}
+.hist-status.over{background:rgba(248,113,113,.15);color:var(--red);}
+.hist-status.empty{background:var(--bg3);color:var(--muted);}
+.hist-macro-pills{display:flex;gap:6px;margin-bottom:10px;}
+.hist-macro-pill{flex:1;background:var(--card);border-radius:9px;padding:8px 5px;text-align:center;border:1px solid var(--border);}
+.hist-pill-val{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;}
+.hist-pill-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.hist-note-row{display:flex;align-items:center;gap:8px;padding-top:9px;border-top:1px solid var(--border);}
+.hist-note-inp{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.74rem;color:var(--text);flex:1;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.hist-note-inp:focus{border-color:var(--green);}
+.hist-note-save{background:var(--green);color:#000;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+
+/* RACHA + PROMEDIO */
+.racha-banner{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:14px;}
+.racha-num{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--green);line-height:1;flex-shrink:0;}
+.racha-info{flex:1;}
+.racha-title{font-size:.82rem;color:var(--text);font-weight:600;margin-bottom:2px;}
+.racha-sub{font-size:.68rem;color:var(--muted2);}
+.racha-dots{display:flex;gap:4px;margin-top:10px;}
+.racha-dot{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;flex-shrink:0;}
+.racha-dot.rd-done{background:rgba(61,214,140,.2);color:var(--green);}
+.racha-dot.rd-miss{background:var(--bg3);color:var(--muted);}
+.racha-dot.rd-today{background:rgba(61,214,140,.3);color:var(--green);border:1px solid var(--green);}
+.racha-dot.rd-future{background:var(--bg3);color:var(--border2);}
+.racha-zero{background:rgba(100,116,139,.08);border:1px solid var(--border);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.avg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.avg-item{background:var(--bg3);border-radius:9px;padding:9px 7px;text-align:center;}
+.avg-val{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
+.avg-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.avg-vs{font-size:.6rem;margin-top:3px;font-weight:600;}
+.avg-vs.avg-good{color:var(--green);}
+.avg-vs.avg-low{color:var(--amber);}
+.avg-vs.avg-over{color:var(--red);}
+
 /* WEIGHT */
 .weight-reminder{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08));border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;animation:fadeIn .4s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
@@ -313,6 +364,7 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
   <!-- NAV TABS -->
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTab('tracker')" id="tab-tracker">📋 Tracker</button>
+    <button class="nav-tab" onclick="switchTab('history')" id="tab-history">📊 Historial</button>
     <button class="nav-tab" onclick="switchTab('recipes')" id="tab-recipes">📖 Recetas</button>
   </div>
 
@@ -439,6 +491,31 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: HISTORIAL ══ -->
+  <div id="view-history" style="display:none">
+
+    <!-- RACHA + PROMEDIO -->
+    <div class="panel" style="margin-bottom:12px;padding:14px">
+      <div id="rachaBox" style="margin-bottom:12px"></div>
+      <div style="height:1px;background:var(--border);margin-bottom:12px"></div>
+      <div class="sec-label" style="margin-bottom:8px">Promedio esta semana</div>
+      <div class="avg-grid" id="avgGrid"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="sec-label" style="margin:0">📊 Historial</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="week-nav-btn" onclick="shiftHistoryWeek(-1)" title="Semana anterior">‹</button>
+        <span style="font-size:.72rem;color:var(--muted2)" id="histWeekLabel">Semana actual</span>
+        <button class="week-nav-btn" onclick="shiftHistoryWeek(1)" id="histNextBtn" title="Semana siguiente">›</button>
+      </div>
+    </div>
+    <div class="panel" style="padding:14px">
+      <div class="hist-days-row" id="histDaysRow"></div>
+      <div class="hist-detail" id="histDetail" style="display:none"></div>
     </div>
   </div>
 
@@ -879,10 +956,12 @@ function saveRecipes(){lsSet(RECIPES_KEY,recipesData);}
 function switchTab(tab){
   currentTab=tab;
   document.getElementById('view-tracker').style.display=tab==='tracker'?'':'none';
+  document.getElementById('view-history').style.display=tab==='history'?'':'none';
   document.getElementById('view-recipes').style.display=tab==='recipes'?'':'none';
   document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   if(tab==='recipes')renderRecipes();
+  if(tab==='history')renderHistory();
 }
 
 // ══════════════════════════════════════════════════
@@ -1729,6 +1808,360 @@ function saveNewRecipe(){
 }
 
 // ══════════════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════════════
+const NOTES_KEY='nt:notes';
+let historyWeekOffset=0;
+let historySelectedDay=null;
+let notesData={};
+
+function loadNotes(){notesData=lsGet(NOTES_KEY,{});}
+function saveNotes(){lsSet(NOTES_KEY,notesData);}
+
+function shiftHistoryWeek(dir){
+  if(historyWeekOffset+dir>0)return;
+  historyWeekOffset+=dir;
+  historySelectedDay=null;
+  renderHistory();
+}
+
+function getDayStatus(kcal){
+  if(!kcal)return'empty';
+  const pct=kcal/TARGETS.kcal;
+  if(pct>=0.9&&pct<=1.12)return'ok';
+  if(pct<0.9)return'low';
+  return'over';
+}
+
+function getStatusLabel(status){
+  return{ok:'✓ Objetivo cumplido',low:'↓ Por debajo',over:'↑ Exceso',empty:'Sin datos'}[status]||'';
+}
+
+function calcRacha(){
+  // Walk backwards from today counting consecutive days that hit >=90% of kcal target
+  const today=new Date();
+  let streak=0;
+  let bestStreak=lsGet('nt:beststreak',0);
+  let d=new Date(today);
+  // Check up to 365 days back
+  for(let i=0;i<365;i++){
+    const str=d.toISOString().slice(0,10);
+    const dayState=lsGet(dateKey(str),{});
+    if(!Object.keys(dayState).length){
+      if(i===0){d.setDate(d.getDate()-1);continue;} // skip today if empty
+      break;
+    }
+    let kcal=0;
+    Object.values(dayState).forEach(foods=>foods.forEach(f=>kcal+=(f.kcal||0)));
+    const pct=kcal/TARGETS.kcal;
+    if(pct>=0.9&&pct<=1.15) streak++;
+    else break;
+    d.setDate(d.getDate()-1);
+  }
+  if(streak>bestStreak){bestStreak=streak;lsSet('nt:beststreak',bestStreak);}
+  return{streak,bestStreak};
+}
+
+function calcWeekAvg(weekOffset){
+  const today=new Date();
+  const dow=today.getDay();
+  const diffToMon=dow===0?-6:1-dow;
+  const monday=new Date(today);
+  monday.setDate(today.getDate()+diffToMon+(weekOffset*7));
+  let totals=[],days=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const str=d.toISOString().slice(0,10);
+    const dayState=lsGet(dateKey(str),{});
+    if(!Object.keys(dayState).length)continue;
+    let t={kcal:0,prot:0,carb:0,fat:0};
+    Object.values(dayState).forEach(foods=>{const s=sumMacros(foods);t.kcal+=s.kcal;t.prot+=s.prot;t.carb+=s.carb;t.fat+=s.fat;});
+    totals.push(t);days++;
+  }
+  if(!days)return null;
+  return{
+    kcal:Math.round(totals.reduce((a,t)=>a+t.kcal,0)/days),
+    prot:+(totals.reduce((a,t)=>a+t.prot,0)/days).toFixed(1),
+    carb:+(totals.reduce((a,t)=>a+t.carb,0)/days).toFixed(1),
+    fat:+(totals.reduce((a,t)=>a+t.fat,0)/days).toFixed(1),
+    days,
+  };
+}
+
+function renderRacha(){
+  const box=document.getElementById('rachaBox');
+  if(!box)return;
+  const{streak,bestStreak}=calcRacha();
+
+  if(streak===0){
+    box.innerHTML=`<div class="racha-zero">
+      <span style="font-size:1.6rem">🎯</span>
+      <div>
+        <div style="font-size:.82rem;color:var(--text);font-weight:600">Sin racha activa</div>
+        <div style="font-size:.68rem;color:var(--muted2);margin-top:2px">Cumplí el objetivo hoy para empezar una racha</div>
+        ${bestStreak>0?`<div style="font-size:.68rem;color:var(--muted2);margin-top:2px">Mejor racha: <span style="color:var(--green);font-weight:700">${bestStreak} días</span></div>`:''}
+      </div>
+    </div>`;
+    renderRachaDots(streak);
+    return;
+  }
+
+  box.innerHTML=`<div class="racha-banner">
+    <div class="racha-num">${streak}</div>
+    <div class="racha-info">
+      <div class="racha-title">${streak===1?'día en racha':streak<10?'días en racha':'días seguidos'} 🔥</div>
+      <div class="racha-sub">Mejor racha: ${bestStreak} días</div>
+    </div>
+  </div>`;
+  renderRachaDots(streak);
+}
+
+function renderRachaDots(streak){
+  const box=document.getElementById('rachaBox');
+  if(!box)return;
+  const dayLabels=['D','L','M','X','J','V','S'];
+  const today=new Date();
+  const dow=today.getDay();
+  const diffToMon=dow===0?-6:1-dow;
+  const monday=new Date(today);
+  monday.setDate(today.getDate()+diffToMon);
+
+  let dotsHtml='<div class="racha-dots">';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const str=d.toISOString().slice(0,10);
+    const isToday=str===getTodayStr();
+    const isFuture=d>today&&!isToday;
+    const dayState=lsGet(dateKey(str),{});
+    let ok=false;
+    if(Object.keys(dayState).length){
+      let kcal=0;
+      Object.values(dayState).forEach(foods=>foods.forEach(f=>kcal+=(f.kcal||0)));
+      ok=kcal/TARGETS.kcal>=0.9&&kcal/TARGETS.kcal<=1.15;
+    }
+    let cls='rd-future';
+    if(isFuture)cls='rd-future';
+    else if(isToday)cls=ok?'rd-today':'rd-miss';
+    else cls=ok?'rd-done':'rd-miss';
+    dotsHtml+=`<div class="racha-dot ${cls}">${isToday?'H':dayLabels[d.getDay()]}</div>`;
+  }
+  dotsHtml+='</div>';
+
+  // Append dots after banner
+  box.innerHTML+=dotsHtml;
+}
+
+function renderAvg(){
+  const grid=document.getElementById('avgGrid');
+  if(!grid)return;
+  const avg=calcWeekAvg(historyWeekOffset);
+  if(!avg){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;font-size:.78rem;color:var(--muted);font-style:italic;padding:8px 0">Sin datos esta semana</div>`;
+    return;
+  }
+  const pct=(v,t)=>Math.round(v/t*100);
+  const cls=(v,t)=>{const p=pct(v,t);return p>=90&&p<=112?'avg-good':p<90?'avg-low':'avg-over';};
+  const arrow=(v,t)=>{const p=pct(v,t);return p>=90&&p<=112?'✓':p<90?'↓':'↑';};
+  grid.innerHTML=`
+    <div class="avg-item">
+      <div class="avg-val" style="color:var(--purple)">${avg.kcal}</div>
+      <div class="avg-lbl">kcal</div>
+      <div class="avg-vs ${cls(avg.kcal,TARGETS.kcal)}">${arrow(avg.kcal,TARGETS.kcal)} ${pct(avg.kcal,TARGETS.kcal)}%</div>
+    </div>
+    <div class="avg-item">
+      <div class="avg-val" style="color:var(--green)">${avg.prot}g</div>
+      <div class="avg-lbl">prot</div>
+      <div class="avg-vs ${cls(avg.prot,TARGETS.prot)}">${arrow(avg.prot,TARGETS.prot)} ${pct(avg.prot,TARGETS.prot)}%</div>
+    </div>
+    <div class="avg-item">
+      <div class="avg-val" style="color:var(--cyan)">${avg.carb}g</div>
+      <div class="avg-lbl">HC</div>
+      <div class="avg-vs ${cls(avg.carb,TARGETS.carb)}">${arrow(avg.carb,TARGETS.carb)} ${pct(avg.carb,TARGETS.carb)}%</div>
+    </div>
+    <div class="avg-item">
+      <div class="avg-val" style="color:var(--amber)">${avg.fat}g</div>
+      <div class="avg-lbl">grasas</div>
+      <div class="avg-vs ${cls(avg.fat,TARGETS.fat)}">${arrow(avg.fat,TARGETS.fat)} ${pct(avg.fat,TARGETS.fat)}%</div>
+    </div>
+    <div style="grid-column:1/-1;font-size:.65rem;color:var(--muted);text-align:center;margin-top:2px">Promedio de ${avg.days} día${avg.days>1?'s':''} con datos · objetivo 2800 kcal</div>`;
+}
+
+function renderHistory(){
+  try{renderRacha();}catch(e){console.error('renderRacha',e);}
+  try{renderAvg();}catch(e){console.error('renderAvg',e);}
+  const dayLabels={1:'LUN',2:'MAR',3:'MIÉ',4:'JUE',5:'VIE',6:'SÁB',0:'DOM'};
+  const trainIcon={swim:'🏊',gym:'🏋️',rest:'😴'};
+  const today=new Date();
+  const dow=today.getDay();
+  const diffToMon=dow===0?-6:1-dow;
+  const monday=new Date(today);
+  monday.setDate(today.getDate()+diffToMon+(historyWeekOffset*7));
+
+  // Week label
+  const lbl=document.getElementById('histWeekLabel');
+  if(lbl){
+    if(historyWeekOffset===0)lbl.textContent='Semana actual';
+    else if(historyWeekOffset===-1)lbl.textContent='Semana pasada';
+    else lbl.textContent='Hace '+Math.abs(historyWeekOffset)+' semanas';
+  }
+  const nextBtn=document.getElementById('histNextBtn');
+  if(nextBtn)nextBtn.disabled=historyWeekOffset>=0;
+
+  // Build 7 day buttons
+  const row=document.getElementById('histDaysRow');
+  if(!row)return;
+  row.innerHTML='';
+
+  const days=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const str=d.toISOString().slice(0,10);
+    const ddow=d.getDay();
+    const dayState=lsGet(dateKey(str),{});
+    let total={kcal:0,prot:0,carb:0,fat:0};
+    Object.values(dayState).forEach(foods=>{const s=sumMacros(foods);total.kcal+=s.kcal;total.prot+=s.prot;total.carb+=s.carb;total.fat+=s.fat;});
+    const hasData=Object.keys(dayState).length>0;
+    const status=hasData?getDayStatus(total.kcal):'empty';
+    const tr=TRAINING[ddow];
+    days.push({str,ddow,total,hasData,status,tr});
+
+    const btn=document.createElement('div');
+    const isSelected=str===historySelectedDay;
+    btn.className='hist-day-btn h'+status+(isSelected?' hactive':'');
+    btn.innerHTML=`
+      <span class="hist-day-name">${dayLabels[ddow]}</span>
+      <span class="hist-day-icon">${trainIcon[tr.type]}</span>
+      <span class="hist-day-kcal">${hasData?Math.round(total.kcal):'—'}</span>
+      <span class="hist-day-pct">${hasData?Math.round(total.kcal/TARGETS.kcal*100)+'%':'—'}</span>`;
+    btn.onclick=()=>selectHistoryDay(str,days[i]);
+    row.appendChild(btn);
+  }
+
+  // Auto-select today or first day with data
+  if(!historySelectedDay){
+    const todayStr=getTodayStr();
+    const todayDay=days.find(d=>d.str===todayStr);
+    const firstWithData=days.find(d=>d.hasData);
+    const toSelect=todayDay||firstWithData||days[0];
+    if(toSelect)selectHistoryDay(toSelect.str,toSelect);
+  } else {
+    const sel=days.find(d=>d.str===historySelectedDay);
+    if(sel)renderHistoryDetail(sel);
+  }
+}
+
+function selectHistoryDay(str,dayData){
+  historySelectedDay=str;
+  // Update active state
+  document.querySelectorAll('.hist-day-btn').forEach(b=>b.classList.remove('hactive'));
+  const btns=document.querySelectorAll('.hist-day-btn');
+  const days=['1','2','3','4','5','6','0'];
+  // Re-render to update active
+  renderHistoryDayButtons();
+  renderHistoryDetail(dayData);
+}
+
+function renderHistoryDayButtons(){
+  // Just update active class without full re-render
+  const allBtns=document.querySelectorAll('#histDaysRow .hist-day-btn');
+  // We need the date for each btn - store it in data attr
+  // Actually simpler to just re-call renderHistory but skip detail
+  const row=document.getElementById('histDaysRow');
+  if(!row)return;
+  const dayLabels={1:'LUN',2:'MAR',3:'MIÉ',4:'JUE',5:'VIE',6:'SÁB',0:'DOM'};
+  const trainIcon={swim:'🏊',gym:'🏋️',rest:'😴'};
+  const today=new Date();
+  const dow=today.getDay();
+  const diffToMon=dow===0?-6:1-dow;
+  const monday=new Date(today);
+  monday.setDate(today.getDate()+diffToMon+(historyWeekOffset*7));
+  row.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const str=d.toISOString().slice(0,10);
+    const ddow=d.getDay();
+    const dayState=lsGet(dateKey(str),{});
+    let total={kcal:0,prot:0,carb:0,fat:0};
+    Object.values(dayState).forEach(foods=>{const s=sumMacros(foods);total.kcal+=s.kcal;total.prot+=s.prot;total.carb+=s.carb;total.fat+=s.fat;});
+    const hasData=Object.keys(dayState).length>0;
+    const status=hasData?getDayStatus(total.kcal):'empty';
+    const tr=TRAINING[ddow];
+    const isSelected=str===historySelectedDay;
+    const btn=document.createElement('div');
+    btn.className='hist-day-btn h'+status+(isSelected?' hactive':'');
+    btn.innerHTML=`
+      <span class="hist-day-name">${dayLabels[ddow]}</span>
+      <span class="hist-day-icon">${trainIcon[tr.type]}</span>
+      <span class="hist-day-kcal">${hasData?Math.round(total.kcal):'—'}</span>
+      <span class="hist-day-pct">${hasData?Math.round(total.kcal/TARGETS.kcal*100)+'%':'—'}</span>`;
+    const dayDataCopy={str,ddow,total,hasData,status,tr};
+    btn.onclick=()=>selectHistoryDay(str,dayDataCopy);
+    row.appendChild(btn);
+  }
+}
+
+function renderHistoryDetail(dayData){
+  const detail=document.getElementById('histDetail');
+  if(!detail)return;
+  detail.style.display='block';
+
+  const dayNames={1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado',0:'Domingo'};
+  const trainLabels={swim:'Natación',gym:'Musculación',rest:'Descanso'};
+  const trainIcons={swim:'🏊',gym:'🏋️',rest:'😴'};
+  const dateObj=new Date(dayData.str+'T12:00:00');
+  const dateLabel=dateObj.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  const dayName=dayNames[dayData.ddow];
+  const note=notesData[dayData.str]||'';
+  const status=dayData.status;
+  const statusLabel=getStatusLabel(status);
+
+  detail.innerHTML=`
+    <div class="hist-detail-wrap">
+      <div class="hist-detail-top">
+        <span class="hist-detail-title">${trainIcons[dayData.tr.type]} ${dayName} ${dateLabel}</span>
+        <span class="hist-status ${status}">${statusLabel}</span>
+      </div>
+      ${dayData.hasData?`
+      <div class="hist-macro-pills">
+        <div class="hist-macro-pill">
+          <div class="hist-pill-val" style="color:var(--purple)">${Math.round(dayData.total.kcal)}</div>
+          <div class="hist-pill-lbl">kcal</div>
+        </div>
+        <div class="hist-macro-pill">
+          <div class="hist-pill-val" style="color:var(--green)">${dayData.total.prot.toFixed(1)}g</div>
+          <div class="hist-pill-lbl">prot</div>
+        </div>
+        <div class="hist-macro-pill">
+          <div class="hist-pill-val" style="color:var(--cyan)">${dayData.total.carb.toFixed(1)}g</div>
+          <div class="hist-pill-lbl">hc</div>
+        </div>
+        <div class="hist-macro-pill">
+          <div class="hist-pill-val" style="color:var(--amber)">${dayData.total.fat.toFixed(1)}g</div>
+          <div class="hist-pill-lbl">grasas</div>
+        </div>
+      </div>`:`
+      <div style="font-size:.78rem;color:var(--muted);font-style:italic;text-align:center;padding:12px 0">Sin datos registrados para este día</div>`}
+      <div class="hist-note-row">
+        <span style="font-size:1rem">📝</span>
+        <input class="hist-note-inp" id="histNoteInput" placeholder="Agregar nota del día..."
+          value="${note.replace(/"/g,'&quot;')}"
+          onkeydown="if(event.key==='Enter')saveHistoryNote('${dayData.str}')">
+        <button class="hist-note-save" onclick="saveHistoryNote('${dayData.str}')">Guardar</button>
+      </div>
+    </div>`;
+}
+
+function saveHistoryNote(dateStr){
+  const inp=document.getElementById('histNoteInput');
+  if(!inp)return;
+  const val=inp.value.trim();
+  if(val)notesData[dateStr]=val;
+  else delete notesData[dateStr];
+  saveNotes();
+  showToast('📝 Nota guardada');
+}
+
+// ══════════════════════════════════════════════════
 //  SETTINGS
 // ══════════════════════════════════════════════════
 function openSettings(){document.getElementById('settingsModal').classList.remove('hidden');}
@@ -1766,6 +2199,7 @@ function init(){
   try{loadState(currentDate);}catch(e){}
   try{loadWeights();}catch(e){}
   try{loadRecipes();}catch(e){}
+  try{loadNotes();}catch(e){}
   try{renderMeals();}catch(e){console.error('renderMeals',e);}
   try{renderMacros();}catch(e){console.error('renderMacros',e);}
   try{renderMealSelector();}catch(e){console.error('renderMealSelector',e);}
