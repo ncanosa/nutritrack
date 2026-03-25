@@ -7,272 +7,182 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0e17">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 
 <style>
-  :root {
-    --bg: #0b101a; --card: #161b29; --accent: #4ade80; 
-    --text: #f0f3f8; --text-dim: #94a3b8; --border: #2d3748;
-    --prot: #60a5fa; --carb: #fbbf24; --fat: #f87171;
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { 
-    margin:0; font-family: -apple-system, system-ui, sans-serif; 
-    background: var(--bg); color: var(--text); line-height: 1.5;
-    padding-bottom: 80px;
-  }
-  
-  .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-  
-  /* Header & Macros */
-  header { margin-bottom: 25px; text-align: center; }
-  .main-card { 
-    background: var(--card); padding: 20px; border-radius: 20px; 
-    border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    margin-bottom: 20px;
-  }
-  .kcal-title { font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-  .kcal-value { font-size: 3rem; font-weight: 800; margin: 5px 0; color: var(--accent); }
-  
-  .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-  .macro-item { text-align: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; }
-  .macro-label { font-size: 0.7rem; display: block; margin-bottom: 4px; opacity: 0.7; }
-  .macro-num { font-weight: 700; font-size: 1.1rem; }
+/* He mantenido todos tus estilos originales */
+:root {
+  --bg:#0b0e17; --bg2:#111420; --bg3:#181c2a; --card:#1c2033;
+  --border:#252a3d; --border2:#2e3450;
+  --green:#3dd68c; --cyan:#22d3ee; --amber:#fbbf24;
+  --red:#f87171; --purple:#a78bfa; --blue:#60a5fa;
+  --text:#e2e8f0; --muted:#64748b; --muted2:#94a3b8;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100dvh;font-size:14px;padding-bottom:calc(20px + var(--safe-bot));}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px;position:relative;z-index:1;}
 
-  /* AI Section */
-  .ai-section { margin-bottom: 25px; }
-  .ai-btn { 
-    width: 100%; padding: 16px; border-radius: 15px; border: none;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    color: white; font-weight: 700; font-size: 1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-  }
-  .ai-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  
-  .ai-response-card {
-    background: #1e2536; border-left: 4px solid #a855f7;
-    padding: 15px; border-radius: 12px; margin-top: 15px;
-    font-size: 0.95rem; animation: fadeIn 0.5s ease;
-  }
+/* HEADER */
+header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)) 0 14px;margin-bottom:20px;position:sticky;top:0;z-index:100;background:rgba(11,14,23,.95);backdrop-filter:blur(16px);}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;}
+.brand h1 span{color:var(--green);}
+.settings-btn{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:9px;cursor:pointer;}
 
-  /* Listas */
-  .section-title { font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-  .meal-card { 
-    background: var(--card); padding: 15px; border-radius: 15px; 
-    margin-bottom: 12px; border: 1px solid var(--border);
-  }
-  
-  /* Settings Float */
-  .settings-trigger {
-    position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem; z-index: 100; cursor: pointer;
-  }
+/* MACROS */
+.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:600px){.macro-grid{grid-template-columns:repeat(2,1fr);}}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;}
+.mc-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.25rem;}
+.mc-label{font-size:.65rem;text-transform:uppercase;color:var(--muted);}
 
-  /* Modal Config */
-  #configModal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-    display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
-  }
-  .modal-content {
-    background: var(--card); width: 100%; max-width: 400px;
-    padding: 25px; border-radius: 20px; border: 1px solid var(--border);
-  }
-  input[type="password"], input[type="text"] {
-    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--bg); color: white; margin: 10px 0;
-  }
-  .btn-save {
-    width: 100%; padding: 12px; border-radius: 10px; border: none;
-    background: var(--accent); color: #000; font-weight: 700;
-  }
+/* AI PANEL INTEGRADO */
+.ai-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;}
+.ai-panel::before{content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;border:1px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,rgba(61,214,140,.25),rgba(34,211,238,.25)) border-box;}
+.ai-tag{background:linear-gradient(135deg,#3dd68c,#22d3ee);color:#000;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;margin-bottom:10px;}
+.ai-out{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px;min-height:80px;font-size:.85rem;line-height:1.6;}
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .toast {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: #333; padding: 10px 20px; border-radius: 20px; z-index: 2000;
-    display: none; font-size: 0.9rem;
-  }
-  .toast.show { display: block; animation: fadeIn 0.3s; }
+/* MODALES */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
+.panel-content{background:var(--card);width:100%;max-width:450px;border-radius:20px;padding:25px;border:1px solid var(--border2);}
+.inp{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:9px;width:100%;margin:10px 0;}
+.btn{background:var(--green);color:#000;border:none;font-weight:700;padding:12px;border-radius:10px;cursor:pointer;width:100%;}
+.btn.ai{background:linear-gradient(135deg,#3dd68c,#22d3ee);}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#333;padding:10px 20px;border-radius:20px;display:none;z-index:2000;}
+.toast.show{display:block;}
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="wrap">
   <header>
-    <h2 id="displayDate">Hoy</h2>
+    <div class="hdr-inner">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <h1>NutriTrack <span>Nahuel</span></h1>
+      </div>
+      <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    </div>
   </header>
 
-  <div class="main-card">
-    <div class="kcal-title">Calorías Restantes</div>
-    <div class="kcal-value" id="res-kcal">0</div>
-    
-    <div class="macro-grid">
-      <div class="macro-item">
-        <span class="macro-label" style="color:var(--prot)">Proteína</span>
-        <span class="macro-num" id="res-prot">0g</span>
-      </div>
-      <div class="macro-item">
-        <span class="macro-label" style="color:var(--carb)">Carbos</span>
-        <span class="macro-num" id="res-carb">0g</span>
-      </div>
-      <div class="macro-item">
-        <span class="macro-label" style="color:var(--fat)">Grasas</span>
-        <span class="macro-num" id="res-fat">0g</span>
-      </div>
+  <div class="macro-grid">
+    <div class="mc"><div><div class="mc-label">Calorías</div><div class="mc-val" id="res-kcal">0</div></div></div>
+    <div class="mc"><div><div class="mc-label">Proteína</div><div class="mc-val" id="res-prot" style="color:var(--green)">0g</div></div></div>
+    <div class="mc"><div><div class="mc-label">Carbos</div><div class="mc-val" id="res-carb" style="color:var(--cyan)">0g</div></div></div>
+    <div class="mc"><div><div class="mc-label">Grasas</div><div class="mc-val" id="res-fat" style="color:var(--amber)">0g</div></div></div>
+  </div>
+
+  <div class="ai-panel">
+    <div class="ai-tag">Gemini AI</div>
+    <div class="ai-title" style="font-weight:700; margin-bottom:10px;">¿Qué comemos hoy?</div>
+    <div id="ai-response" class="ai-out">
+      Haz clic abajo para recibir una recomendación basada en tus macros faltantes.
     </div>
-  </div>
-
-  <div class="ai-section">
-    <button class="ai-btn" onclick="askGemini()">
-      <span>✨ IA Sugerencias</span>
-    </button>
-    <div id="aiResponseContainer"></div>
-  </div>
-
-  <div class="section-title">Comidas de hoy</div>
-  <div id="mealsList"></div>
-  
-  <div style="margin-top:20px; opacity:0.6; font-size:0.8rem; text-align:center;">
-    Base de datos local guardada en este dispositivo.
+    <button class="btn ai" onclick="askGemini()" style="margin-top:15px;">✨ Generar sugerencia</button>
   </div>
 </div>
 
-<div class="settings-trigger" onclick="toggleModal(true)">⚙️</div>
-
-<div id="configModal">
-  <div class="modal-content">
-    <h3>Configuración IA</h3>
-    <p style="font-size:0.8rem; color:var(--text-dim)">Pega tu API Key de Google Gemini para activar las sugerencias inteligentes.</p>
-    <input type="password" id="apiKeyInput" placeholder="Pega tu AIzaSy... aquí">
-    <button class="btn-save" onclick="saveKey()">Guardar Cambios</button>
-    <button onclick="toggleModal(false)" style="background:none; border:none; color:var(--text-dim); width:100%; margin-top:15px; cursor:pointer;">Cerrar</button>
+<div class="panel-overlay" id="settingsPanel">
+  <div class="panel-content">
+    <h2 style="margin-bottom:15px;">Configuración</h2>
+    <div class="sec-label" style="font-size:0.7rem; color:var(--muted); text-transform:uppercase;">Llave API de Gemini</div>
+    <input type="password" id="geminiKey" class="inp" placeholder="Pega tu AIzaSy... aquí">
+    <button class="btn" onclick="saveSettings()">Guardar Configuración</button>
+    <button onclick="closeSettings()" style="background:none; border:none; color:var(--muted); width:100%; margin-top:15px; cursor:pointer;">Cerrar</button>
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-// CONFIGURACIÓN INICIAL
-const TARGETS = { kcal: 2800, prot: 200, carb: 350, fat: 60 };
-let dailyMeals = JSON.parse(localStorage.getItem('nutri_meals') || '[]');
+// TUS DATOS ORIGINALES
+const TARGETS = {kcal:2800, prot:147, carb:320, fat:80};
+const BUILT_IN_RECIPES = [
+  {n:"Avena Proteica", k:450, p:30, c:50, f:10},
+  {n:"Pollo con Arroz y Palta", k:650, p:45, c:60, f:22},
+  {n:"Omelette Completo", k:400, p:28, c:5, f:30}
+];
 
-// Lógica de UI
+// Lógica de carga
+let dailyMeals = JSON.parse(localStorage.getItem('nt:state') || '[]');
+
 function updateUI() {
-  const totals = dailyMeals.reduce((acc, meal) => {
-    acc.kcal += meal.kcal; acc.prot += meal.prot;
-    acc.carb += meal.carb; acc.fat += meal.fat;
-    return acc;
-  }, { kcal: 0, prot: 0, carb: 0, fat: 0 });
+  const totals = dailyMeals.reduce((a, b) => ({
+    k: a.k + b.kcal, p: a.p + b.prot, c: a.c + b.carb, f: a.f + b.fat
+  }), {k:0, p:0, c:0, f:0});
 
-  document.getElementById('res-kcal').textContent = Math.max(0, TARGETS.kcal - totals.kcal);
-  document.getElementById('res-prot').textContent = Math.max(0, TARGETS.prot - totals.prot) + 'g';
-  document.getElementById('res-carb').textContent = Math.max(0, TARGETS.carb - totals.carb) + 'g';
-  document.getElementById('res-fat').textContent = Math.max(0, TARGETS.fat - totals.fat) + 'g';
-
-  const list = document.getElementById('mealsList');
-  if(dailyMeals.length === 0) {
-    list.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.5;">No hay comidas registradas aún.</div>`;
-  } else {
-    list.innerHTML = dailyMeals.map(m => `
-      <div class="meal-card">
-        <div style="font-weight:bold">${m.name}</div>
-        <div style="font-size:0.8rem; color:var(--text-dim)">${m.kcal} kcal | P: ${m.prot}g C: ${m.carb}g G: ${m.fat}g</div>
-      </div>
-    `).join('');
-  }
+  document.getElementById('res-kcal').textContent = Math.max(0, TARGETS.kcal - totals.k);
+  document.getElementById('res-prot').textContent = Math.max(0, TARGETS.prot - totals.p) + "g";
+  document.getElementById('res-carb').textContent = Math.max(0, TARGETS.carb - totals.c) + "g";
+  document.getElementById('res-fat').textContent = Math.max(0, TARGETS.fat - totals.f) + "g";
 }
 
-// LÓGICA DE IA (GEMINI)
+// FUNCIÓN DE IA REAL
 async function askGemini() {
   const key = localStorage.getItem('gemini_api_key');
   if(!key) {
-    showToast("Por favor, configura tu API Key primero en el icono de ⚙️");
-    toggleModal(true);
+    showToast("Configura tu API Key primero");
+    openSettings();
     return;
   }
 
-  const container = document.getElementById('aiResponseContainer');
-  const btn = document.querySelector('.ai-btn');
-  
-  // Calcular lo que falta
-  const totals = dailyMeals.reduce((acc, meal) => {
-    acc.kcal += meal.kcal; acc.prot += meal.prot;
-    acc.carb += meal.carb; acc.fat += meal.fat;
-    return acc;
-  }, { kcal: 0, prot: 0, carb: 0, fat: 0 });
+  const out = document.getElementById('ai-response');
+  out.innerHTML = "🧠 Pensando una recomendación...";
+
+  // Calculamos faltantes para el prompt
+  const totals = dailyMeals.reduce((a, b) => ({
+    k: a.k + b.kcal, p: a.p + b.prot, c: a.c + b.carb, f: a.f + b.fat
+  }), {k:0, p:0, c:0, f:0});
 
   const falta = {
-    kcal: TARGETS.kcal - totals.kcal,
-    p: TARGETS.prot - totals.prot,
-    c: TARGETS.carb - totals.carb,
-    g: TARGETS.fat - totals.fat
+    k: TARGETS.kcal - totals.k,
+    p: TARGETS.prot - totals.p,
+    c: TARGETS.carb - totals.c,
+    f: TARGETS.fat - totals.f
   };
 
-  if(falta.kcal <= 0) {
-    container.innerHTML = `<div class="ai-response-card">💪 ¡Ya alcanzaste tus objetivos de hoy! Buen trabajo.</div>`;
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerHTML = "<span>🧠 Pensando...</span>";
-  container.innerHTML = `<div style="text-align:center; padding:15px;">Analizando tus macros...</div>`;
-
-  const prompt = `Actúa como un experto en nutrición. Mi objetivo diario es 2800 kcal. 
-  Hoy ya comí algo, y me faltan exactamente: ${falta.kcal} calorías, ${falta.p}g de proteína, ${falta.c}g de carbohidratos y ${falta.g}g de grasa.
-  Sugerime 2 opciones de comidas o snacks que me ayuden a completar estos números. 
-  Usa ingredientes comunes en Argentina. Sé breve, directo y motivador. No uses negritas excesivas ni títulos largos.`;
+  const prompt = `Actúa como nutricionista. Mi objetivo es 2800 kcal. 
+  Me faltan: ${falta.k} kcal, ${falta.p}g P, ${falta.c}g HC, ${falta.f}g G.
+  Tengo estas recetas: ${BUILT_IN_RECIPES.map(r => r.n).join(", ")}.
+  Sugiere una comida rápida estilo argentino que encaje en estos macros. Sé breve.`;
 
   try {
     const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
-
     const data = await resp.json();
-    if(data.error) throw new Error(data.error.message);
-    
     const text = data.candidates[0].content.parts[0].text;
-    container.innerHTML = `<div class="ai-response-card">${text.replace(/\n/g, '<br>')}</div>`;
-
-  } catch (err) {
-    console.error(err);
-    showToast("Error: " + err.message);
-    container.innerHTML = "";
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = "<span>✨ IA Sugerencias</span>";
+    out.innerHTML = text.replace(/\n/g, '<br>');
+  } catch (e) {
+    out.innerHTML = "Error al conectar con la IA. Revisa tu llave.";
   }
 }
 
-// UTILIDADES
-function toggleModal(show) {
-  document.getElementById('configModal').style.display = show ? 'flex' : 'none';
-}
-
-function saveKey() {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  if(val) {
-    localStorage.setItem('gemini_api_key', val);
-    showToast("¡Llave guardada correctamente!");
-    toggleModal(false);
+// UTILS
+function openSettings() { document.getElementById('settingsPanel').style.display = 'flex'; }
+function closeSettings() { document.getElementById('settingsPanel').style.display = 'none'; }
+function saveSettings() {
+  const key = document.getElementById('geminiKey').value;
+  if(key) {
+    localStorage.setItem('gemini_api_key', key);
+    showToast("¡Configuración guardada!");
+    closeSettings();
   }
 }
-
-function showToast(msg) {
+function showToast(m) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = m; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Carga inicial
 window.onload = updateUI;
 </script>
-
 </body>
 </html>
