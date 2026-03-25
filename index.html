@@ -8,10 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NutriTrack">
 <meta name="theme-color" content="#0b0e17">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Seguimiento nutricional personalizado · 2800 kcal">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230b0e17'/><text y='120' x='90' text-anchor='middle' font-size='100'>🥗</text></svg>">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230b0e17'/><text y='24' x='16' text-anchor='middle' font-size='22'>🥗</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -26,185 +22,128 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100dvh;font-size:14px;padding-bottom:calc(20px + var(--safe-bot));}
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px;position:relative;z-index:1;}
-
-/* HEADER */
 header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)) 0 14px;margin-bottom:20px;position:sticky;top:0;z-index:100;background:rgba(11,14,23,.95);backdrop-filter:blur(16px);}
-.hdr-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.brand{display:flex;align-items:center;gap:10px;}
-.brand h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-.3px;}
+.brand h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;}
 .brand h1 span{color:var(--green);}
-.settings-btn{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-
-/* MACRO CARDS */
 .macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
 @media(max-width:600px){.macro-grid{grid-template-columns:repeat(2,1fr);}}
 .mc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;}
-.mc-info{display:flex;flex-direction:column;gap:2px;}
 .mc-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.25rem;line-height:1;}
-.mc.kcal .mc-val{color:var(--purple);}
-.mc.prot .mc-val{color:var(--green);}
-.mc.carb .mc-val{color:var(--cyan);}
-.mc.fat .mc-val{color:var(--amber);}
+.mc.kcal .mc-val{color:var(--purple);} .mc.prot .mc-val{color:var(--green);}
+.mc.carb .mc-val{color:var(--cyan);} .mc.fat .mc-val{color:var(--amber);}
 .mc-label{font-size:.65rem;text-transform:uppercase;color:var(--muted);}
-
-/* LAYOUT */
-.main-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start;}
+.main-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;}
 @media(max-width:860px){.main-grid{grid-template-columns:1fr;}}
-
-/* PANELS */
-.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:13px;}
-.sec-label{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--muted);margin-bottom:11px;}
-
-/* AI PANEL (Al final de la derecha) */
-.ai-panel{position:relative; border:1px solid var(--purple)!important;}
-.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.ai-tag{background:var(--purple);color:#000;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:8px;}
-.ai-out{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px;font-size:.85rem;line-height:1.6;min-height:60px;}
-.btn{background:var(--green);color:#000;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;padding:10px 14px;border-radius:9px;cursor:pointer;width:100%;margin-top:10px;}
-.btn.purple{background:var(--purple);}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:none;align-items:center;justify-content:center;}
-.modal-box{background:var(--card);padding:24px;border-radius:20px;width:90%;max-width:400px;border:1px solid var(--border2);}
-.inp{width:100%;background:var(--bg3);border:1px solid var(--border);color:#fff;padding:10px;border-radius:10px;margin:10px 0;outline:none;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.ai-panel{border:1px solid var(--green); position:relative;}
+.ai-out{background:var(--bg3);border-radius:11px;padding:12px;min-height:80px;font-size:.8rem;margin-top:10px;}
+.btn{background:var(--green);color:#000;border:none;font-family:'Syne',sans-serif;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;}
+.btn.ai{background:linear-gradient(135deg,#3dd68c,#22d3ee);}
+.inp{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:9px;outline:none;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;display:none;z-index:1000;}
+.toast.show{display:block;}
+.toast.err{background:var(--red);color:#fff;}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap">
-    <div class="hdr-inner">
-      <div class="brand"><h1>Nutri<span>Track</span></h1></div>
-      <button class="settings-btn" onclick="toggleModal(true)">⚙️</button>
-    </div>
+    <div class="brand"><h1>NutriTrack <span>· Nahuel</span></h1></div>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="macro-grid">
-    <div class="mc kcal"><div class="mc-info"><span class="mc-label">Calorías</span><div id="kcal-val" class="mc-val">2800</div></div></div>
-    <div class="mc prot"><div class="mc-info"><span class="mc-label">Proteína</span><div id="prot-val" class="mc-val">0g</div></div></div>
-    <div class="mc carb"><div class="mc-info"><span class="mc-label">Carbos</span><div id="carb-val" class="mc-val">0g</div></div></div>
-    <div class="mc fat"><div class="mc-info"><span class="mc-label">Grasas</span><div id="fat-val" class="mc-val">0g</div></div></div>
+  <div class="macro-grid" id="macroGrid">
+    <div class="mc kcal"><div class="mc-info"><div class="mc-val" id="mKcal">0</div><div class="mc-label">Calorías</div></div></div>
+    <div class="mc prot"><div class="mc-info"><div class="mc-val" id="mProt">0g</div><div class="mc-label">Proteína</div></div></div>
+    <div class="mc carb"><div class="mc-info"><div class="mc-val" id="mCarb">0g</div><div class="mc-label">Carbohidratos</div></div></div>
+    <div class="mc fat"><div class="mc-info"><div class="mc-val" id="mFat">0g</div><div class="mc-label">Grasas</div></div></div>
   </div>
 
   <div class="main-grid">
-    <div class="meals-col">
-       <div class="panel">
-         <div class="sec-label">Comidas de Hoy</div>
-         <div id="meal-list" style="color:var(--muted)">No hay alimentos cargados.</div>
-       </div>
-    </div>
+    <div class="meals-col" id="mealsCol">
+      </div>
 
     <div class="right-col">
-      <div class="panel">
-        <div class="sec-label">Resumen Diario</div>
-        <p style="font-size:0.8rem">Aquí verás tu progreso semanal y rachas.</p>
-      </div>
-
       <div class="panel ai-panel">
-        <div class="ai-hdr">
-          <span class="ai-tag">Gemini Flash</span>
-          <span class="sec-label" style="margin:0">Recomendación IA</span>
-        </div>
-        <div id="ai-out" class="ai-out">
-          ¿Qué te gustaría comer hoy? Tocá el botón para sugerencias basadas en tus macros.
-        </div>
-        <button class="btn purple" id="btn-ia" onclick="getAISuggestion()">✨ Sugerir Comida</button>
+        <div class="brand"><h3>Asistente IA</h3></div>
+        <p style="font-size:0.7rem; color:var(--muted); margin-bottom:10px;">Sugiere comidas basadas en tus macros faltantes.</p>
+        <input type="password" id="apiKey" class="inp" style="width:100%; margin-bottom:10px;" placeholder="Pega tu Gemini API Key aquí">
+        <button class="btn ai" id="aiBtn" onclick="askAI()" style="width:100%">✨ Sugerir Comida</button>
+        <div class="ai-out" id="aiOut">Selecciona una comida para recibir sugerencias...</div>
       </div>
     </div>
   </div>
 </div>
 
-<div id="modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 style="font-family:Syne">Configuración API</h3>
-    <p style="font-size:0.7rem; color:var(--muted); margin-top:5px;">Ingresá tu API Key de Gemini:</p>
-    <input type="password" id="apiKeyInp" class="inp" placeholder="AIzaSy...">
-    <button class="btn" onclick="saveKey()">Guardar</button>
-    <button class="btn" style="background:none; color:var(--muted)" onclick="toggleModal(false)">Cerrar</button>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
 
 <script>
-// CONFIGURACIÓN Y ESTADO
-const TARGETS = { kcal: 2800, prot: 150, carb: 350, fat: 70 };
-let consumed = { kcal: 0, prot: 0, carb: 0, fat: 0 };
+'use strict';
 
-function toggleModal(show) {
-  document.getElementById('modal').style.display = show ? 'flex' : 'none';
+const TARGETS = {kcal:2800, prot:147, carb:371, fat:81};
+let selectedMealForAI = "Almuerzo"; 
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type === 'err' ? 'err' : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function saveKey() {
-  const key = document.getElementById('apiKeyInp').value.trim();
-  if(key) {
-    localStorage.setItem('gemini_api_key', key);
-    alert("API Key guardada correctamente.");
-    toggleModal(false);
-  }
-}
+// FUNCIÓN CORREGIDA PARA GEMINI V1BETA
+async function askAI() {
+  const btn = document.getElementById('aiBtn');
+  const out = document.getElementById('aiOut');
+  const keyInp = document.getElementById('apiKey').value || localStorage.getItem('nutri_gemini_key');
 
-// LÓGICA DE IA (CORREGIDA PARA V1BETA)
-async function getAISuggestion() {
-  const key = localStorage.getItem('gemini_api_key');
-  if(!key) {
-    alert("Primero configurá tu API Key en el engranaje ⚙️");
-    toggleModal(true);
+  if (!keyInp) {
+    showToast('Por favor, ingresa tu API Key', 'err');
     return;
   }
+  localStorage.setItem('nutri_gemini_key', keyInp);
 
-  const out = document.getElementById('ai-out');
-  const btn = document.getElementById('btn-ia');
-
-  // Calcular faltantes
-  const falta = {
-    k: TARGETS.kcal - consumed.kcal,
-    p: TARGETS.prot - consumed.prot,
-    c: TARGETS.carb - consumed.carb,
-    f: TARGETS.fat - consumed.fat
-  };
+  const prompt = `Actúa como nutricionista. Sugiere 3 opciones para "${selectedMealForAI}" para un objetivo de 2800kcal. 
+  Responde brevemente en español.`;
 
   btn.disabled = true;
-  out.innerHTML = "Consultando a la IA... ⏳";
-
-  const prompt = `Usuario: Nahuel. Objetivo: 2800 kcal. 
-  Le faltan: ${falta.k} kcal, ${falta.p}g prot, ${falta.c}g carb, ${falta.f}g grasa.
-  Sugiere una comida argentina rápida que ayude a completar estos macros. Sé breve y motivador.`;
+  out.innerHTML = "Generando sugerencias...";
 
   try {
-    // CAMBIO A V1BETA PARA EVITAR EL ERROR "NOT FOUND"
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-    
-    const response = await fetch(url, {
+    // ENDPOINT Y ESTRUCTURA CORREGIDOS
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keyInp}`;
+
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
       })
     });
 
     const data = await response.json();
-    
-    if(data.error) throw new Error(data.error.message);
 
-    const texto = data.candidates[0].content.parts[0].text;
-    out.innerHTML = texto.replace(/\n/g, '<br>');
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Error en la API');
+    }
+
+    // Extracción correcta del texto
+    const aiText = data.candidates[0].content.parts[0].text;
+    out.innerHTML = `<div style="white-space:pre-wrap;">${aiText}</div>`;
 
   } catch (e) {
-    out.innerHTML = "❌ Error: " + e.message;
+    console.error(e);
+    out.innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`;
   } finally {
     btn.disabled = false;
   }
 }
 
-// Inicialización
-window.onload = () => {
-  document.getElementById('kcal-val').innerText = TARGETS.kcal;
-  document.getElementById('prot-val').innerText = TARGETS.prot + "g";
-  // Cargar key si existe
-  const savedKey = localStorage.getItem('gemini_api_key');
-  if(savedKey) document.getElementById('apiKeyInp').value = savedKey;
-};
+// Inicialización básica de la interfaz
+document.getElementById('apiKey').value = localStorage.getItem('nutri_gemini_key') || '';
 </script>
 </body>
 </html>
