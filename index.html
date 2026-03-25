@@ -1902,17 +1902,7 @@ const BUILT_IN_RECIPES = [
       {name:'Chocolate negro 70%',grams:20,note:'En trozos'},
       {name:'Nueces',grams:10,note:'Picadas grueso (o mix de frutos secos)'},
     ],
-    steps:'1. Precalentás el horno a 180°
-2. Pisás las bananas hasta puré
-3. Agregás los 2 huevos enteros y las 2 claras, mezclás bien
-4. Sumás la ricota, la leche y la miel
-5. Incorporás la avena, la harina de almendras, el whey y la canela a gusto
-6. Agregás el polvo de hornear (1 cdita) y mezclás
-7. Incorporás el chocolate en trozos y los frutos secos
-8. Volcás en molde enmantecado o con papel manteca
-9. Horno 180° por 35-40 minutos
-10. Pinchás con palillo — si sale limpio está listo
-11. Dejás enfriar antes de cortar. Heladera hasta 6 días',
+    steps:'1. Precalentás el horno a 180°\n2. Pisás las bananas hasta puré\n3. Agregás los 2 huevos enteros y las 2 claras, mezclás bien\n4. Sumás la ricota, la leche y la miel\n5. Incorporás la avena, la harina de almendras, el whey y la canela a gusto\n6. Agregás el polvo de hornear (1 cdita) y mezclás\n7. Incorporás el chocolate en trozos y los frutos secos\n8. Volcás en molde enmantecado o con papel manteca\n9. Horno 180° por 35-40 minutos\n10. Pinchás con palillo — si sale limpio está listo\n11. Dejás enfriar antes de cortar. Heladera hasta 6 días',
     notes:'~129 kcal y 8g de proteína por porción. Mucho más proteico que el budín clásico. Podés reemplazar la harina de almendras por más avena si no tenés. El whey de vainilla le da buen sabor sin azúcar extra.',
     builtin:true,
   },
@@ -2170,13 +2160,15 @@ function calcRacha(){
 
 function calcWeekAvg(weekOffset){
   const today=new Date();
+  if(isNaN(today.getTime()))return null;
   const dow=today.getDay();
   const diffToMon=dow===0?-6:1-dow;
   const monday=new Date(today);
-  monday.setDate(today.getDate()+diffToMon+(weekOffset*7));
+  monday.setDate(today.getDate()+diffToMon+((weekOffset||0)*7));
   let totals=[],days=0;
   for(let i=0;i<7;i++){
     const d=new Date(monday);d.setDate(monday.getDate()+i);
+    if(isNaN(d.getTime()))continue;
     const str=d.toISOString().slice(0,10);
     const dayState=lsGet(dateKey(str),{});
     if(!Object.keys(dayState).length)continue;
