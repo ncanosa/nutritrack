@@ -260,6 +260,21 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .avg-vs.avg-low{color:var(--amber);}
 .avg-vs.avg-over{color:var(--red);}
 
+/* NOTIFICATIONS */
+.notif-panel{display:flex;flex-direction:column;gap:8px;}
+.notif-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:11px 14px;}
+.notif-info{display:flex;flex-direction:column;gap:2px;}
+.notif-title{font-size:.8rem;color:var(--text);font-weight:500;}
+.notif-sub{font-size:.68rem;color:var(--muted);}
+.notif-right{display:flex;align-items:center;gap:8px;}
+.notif-time-sel{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-size:.72rem;padding:5px 8px;border-radius:7px;outline:none;}
+.toggle-wrap{width:42px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.toggle-wrap.on{background:var(--green);}
+.toggle-knob{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s;}
+.toggle-wrap.on .toggle-knob{left:20px;}
+.notif-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:10px 12px;font-size:.72rem;color:var(--amber);line-height:1.6;margin-top:4px;}
+.notif-grant-btn{background:rgba(61,214,140,.15);color:var(--green);border:1px solid rgba(61,214,140,.3);border-radius:9px;font-size:.74rem;font-weight:700;padding:8px 14px;cursor:pointer;width:100%;font-family:'Syne',sans-serif;margin-top:8px;}
+
 /* ENERGY STATE */
 .energy-panel{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;}
 .energy-row{display:flex;gap:6px;}
@@ -274,6 +289,13 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .ew-day.ew-current{background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.3);}
 .ew-name{font-size:.56rem;color:var(--muted);font-weight:700;display:block;}
 .ew-ico{font-size:.8rem;display:block;margin-top:2px;}
+.ew-note-dot{width:4px;height:4px;border-radius:50%;background:var(--amber);margin:2px auto 0;}
+.energy-note-wrap{margin-top:8px;}
+.energy-note-area{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:9px 11px;display:flex;align-items:flex-start;gap:8px;}
+.energy-note-inp{background:transparent;border:none;outline:none;color:var(--text);font-size:.74rem;font-family:'DM Sans',sans-serif;width:100%;resize:none;line-height:1.5;}
+.energy-note-inp::placeholder{color:var(--muted);}
+.energy-note-meta{font-size:.64rem;color:var(--muted2);}
+.energy-note-save{background:none;border:none;color:var(--green);font-size:.68rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;padding:0;}
 
 /* FAVORITES */
 .food-del-row{display:flex;gap:4px;flex-shrink:0;}
@@ -431,6 +453,20 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
           <div class="energy-btn" id="ebtn-high" onclick="setEnergy('high')">
             <span class="energy-ico">⚡</span>
             <span class="energy-lbl">Alto</span>
+          </div>
+        </div>
+        <div class="energy-note-wrap" id="energyNoteWrap" style="display:none">
+          <div class="energy-note-area">
+            <span style="font-size:.9rem;margin-top:2px;flex-shrink:0">📝</span>
+            <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+              <textarea class="energy-note-inp" id="energyNoteInp" rows="2"
+                placeholder="Nota del día... ej: dormí poco, piernas cargadas, entrené bien"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveEnergyNote()}"></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span class="energy-note-meta" id="energyNoteMeta"></span>
+                <button class="energy-note-save" onclick="saveEnergyNote()">Guardar</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="energy-week" id="energyWeek"></div>
@@ -615,6 +651,65 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
     <button class="modal-close" onclick="closeSettings()">✕</button>
     <div class="modal-title">⚙️ Configuración</div>
     <div class="modal-sub">Las sugerencias funcionan 100% local, sin internet ni claves.</div>
+
+    <div style="margin-bottom:14px">
+      <div class="sec-label">🔔 Recordatorios</div>
+      <div class="notif-panel" id="notifPanel">
+        <div class="notif-row">
+          <div class="notif-info"><span class="notif-title">☀️ Desayuno</span><span class="notif-sub">Recordatorio matutino</span></div>
+          <div class="notif-right">
+            <select class="notif-time-sel" id="ntime-desayuno" onchange="saveNotifSettings()">
+              <option value="07:00">7:00</option><option value="08:00">8:00</option>
+              <option value="09:00" selected>9:00</option><option value="09:30">9:30</option>
+            </select>
+            <div class="toggle-wrap" id="ntoggle-desayuno" onclick="toggleNotif('desayuno')"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+        <div class="notif-row">
+          <div class="notif-info"><span class="notif-title">🍎 Media mañana</span><span class="notif-sub">Si no cargaste nada aún</span></div>
+          <div class="notif-right">
+            <select class="notif-time-sel" id="ntime-media" onchange="saveNotifSettings()">
+              <option value="10:00">10:00</option><option value="10:30">10:30</option>
+              <option value="11:00" selected>11:00</option><option value="11:30">11:30</option>
+            </select>
+            <div class="toggle-wrap" id="ntoggle-media" onclick="toggleNotif('media')"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+        <div class="notif-row">
+          <div class="notif-info"><span class="notif-title">⚡ Pre-entreno</span><span class="notif-sub">Solo días de entreno</span></div>
+          <div class="notif-right">
+            <select class="notif-time-sel" id="ntime-preentreno" onchange="saveNotifSettings()">
+              <option value="15:30">15:30</option><option value="16:00" selected>16:00</option>
+              <option value="16:30">16:30</option><option value="17:00">17:00</option>
+            </select>
+            <div class="toggle-wrap" id="ntoggle-preentreno" onclick="toggleNotif('preentreno')"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+        <div class="notif-row">
+          <div class="notif-info"><span class="notif-title">🌙 Cena</span><span class="notif-sub">Cierre del día</span></div>
+          <div class="notif-right">
+            <select class="notif-time-sel" id="ntime-cena" onchange="saveNotifSettings()">
+              <option value="20:00">20:00</option><option value="20:30">20:30</option>
+              <option value="21:00" selected>21:00</option><option value="21:30">21:30</option>
+            </select>
+            <div class="toggle-wrap" id="ntoggle-cena" onclick="toggleNotif('cena')"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+        <div class="notif-row">
+          <div class="notif-info"><span class="notif-title">⚖️ Pesaje quincenal</span><span class="notif-sub">Cada 14 días</span></div>
+          <div class="notif-right">
+            <div class="toggle-wrap" id="ntoggle-peso" onclick="toggleNotif('peso')"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+        <button class="notif-grant-btn" id="notifGrantBtn" onclick="requestNotifPermission()" style="display:none">
+          🔔 Activar permisos de notificación
+        </button>
+        <div class="notif-warn">
+          ⚠️ Si es la primera vez, andá a <strong>Ajustes → NutriTrack → Notificaciones</strong> y activá los permisos. La app debe estar instalada en la pantalla de inicio.
+        </div>
+      </div>
+    </div>
+
     <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
       <div class="sec-label">Zona de peligro</div>
       <button class="btn danger" style="width:100%" onclick="clearAllData()">🗑 Borrar todos mis datos</button>
@@ -728,7 +823,26 @@ const FOOD_DB = [
   {n:'Manteca',k:717,p:.9,c:.1,f:81},
   {n:'Miel',k:304,p:.3,c:82,f:0},{n:'Mermelada',k:250,p:.4,c:65,f:.1},
   {n:'Dulce de leche',k:320,p:7,c:55,f:8},{n:'Azúcar',k:387,p:0,c:100,f:0},
+  {n:'Dulce de batata',k:310,p:1.5,c:75,f:.3},
+  {n:'Dulce de membrillo',k:265,p:.5,c:65,f:.2},
   {n:'Chocolate negro 70%',k:546,p:8,c:46,f:36},
+  // BEBIDAS (macros por 100ml o por porción indicada)
+  {n:'Café solo (100ml)',k:2,p:.3,c:0,f:0},
+  {n:'Café con leche desc (200ml)',k:42,p:4.1,c:6,f:.12},
+  {n:'Café con leche entera (200ml)',k:74,p:3.8,c:5.8,f:4},
+  {n:'Té solo (200ml)',k:2,p:0,c:.4,f:0},
+  {n:'Té con leche desc (200ml)',k:38,p:3.4,c:5.4,f:.1},
+  {n:'Mate (cebado, 200ml)',k:4,p:.3,c:.6,f:0},
+  {n:'Mate cocido (200ml)',k:3,p:.2,c:.4,f:0},
+  {n:'Jugo de naranja natural (200ml)',k:90,p:1.4,c:20,f:.4},
+  {n:'Agua con limón (200ml)',k:8,p:.2,c:2,f:0},
+  {n:'Bebida isotónica (500ml)',k:150,p:0,c:38,f:0},
+  {n:'Leche chocolatada desc (200ml)',k:138,p:6.6,c:24,f:1.6},
+  // BATIDOS
+  {n:'Batido de whey con agua (300ml)',k:130,p:26,c:4,f:2},
+  {n:'Batido de whey con leche desc (300ml)',k:238,p:37,c:19,f:2.4},
+  {n:'Batido de yogur y fruta (300ml)',k:195,p:11,c:30,f:3},
+  {n:'Licuado de banana y leche (300ml)',k:220,p:7.5,c:40,f:2.5},
   // VARIOS
   {n:'Whey protein (scoop)',k:400,p:80,c:10,f:7},
   {n:'Tapa de empanada (1u)',k:110,p:2.5,c:18,f:3},
@@ -745,14 +859,13 @@ const MEAL_TEMPLATES = {
     {title:'Tostada con palta y huevo',items:['Pan integral','Palta','Huevo entero','Tomate'],grams:[60,80,100,50]},
     {title:'Tostada con ricota y tomate',items:['Pan integral','Ricota descremada','Tomate','Aceite de oliva'],grams:[60,80,80,5]},
     {title:'Wrap de huevo y verdura',items:['Tortilla integral','Huevo entero','Espinaca','Queso semidescremado'],grams:[60,100,40,30]},
-    {title:'Tostada con queso y huevo',items:['Pan integral','Queso semidescremado','Huevo entero','Leche descremada'],grams:[90,40,50,150]},
+    {title:'Tostada con queso y huevo',items:['Pan integral','Queso semidescremado','Huevo entero','Café con leche desc (200ml)'],grams:[90,40,50,200]},
     {title:'Revuelto con ricota',items:['Huevo entero','Ricota descremada','Pan integral','Aceite de oliva'],grams:[100,60,60,5]},
-    {title:'Sándwich caliente de queso',items:['Pan integral','Huevo entero','Queso semidescremado','Leche descremada'],grams:[90,50,40,150]},
-    {title:'Tostada con queso y tomate seco',items:['Pan integral','Queso semidescremado','Miel','Leche descremada'],grams:[90,40,10,150]},
-    {title:'Huevos a la plancha con pan',items:['Huevo entero','Pan integral','Queso semidescremado','Leche descremada'],grams:[100,90,30,150]},
+    {title:'Sándwich caliente de queso',items:['Pan integral','Huevo entero','Queso semidescremado','Café con leche desc (200ml)'],grams:[90,50,40,200]},
+    {title:'Huevos a la plancha con pan',items:['Huevo entero','Pan integral','Queso semidescremado','Café con leche desc (200ml)'],grams:[100,90,30,200]},
     {title:'Tostada caprese',items:['Pan integral','Ricota descremada','Tomate','Aceite de oliva'],grams:[90,80,80,10]},
     {title:'Omelette queso y palta',items:['Huevo entero','Queso semidescremado','Palta','Pan integral'],grams:[100,30,60,60]},
-    {title:'Tostada con hummus y huevo',items:['Pan integral','Hummus','Huevo entero','Leche descremada'],grams:[90,60,50,150]},
+    {title:'Tostada con hummus y huevo',items:['Pan integral','Hummus','Huevo entero','Café con leche desc (200ml)'],grams:[90,60,50,200]},
     // DULCES/BOWL
     {title:'Avena con banana y miel',items:['Avena arrollada','Leche descremada','Banana','Miel'],grams:[50,200,100,15]},
     {title:'Overnight kiwi y miel',items:['Avena arrollada','Yogur griego','Leche descremada','Kiwi','Miel'],grams:[50,150,100,100,10]},
@@ -772,13 +885,14 @@ const MEAL_TEMPLATES = {
     {title:'Porridge naranja y almendras',items:['Avena arrollada','Leche descremada','Naranja','Almendras'],grams:[60,250,150,15]},
     {title:'Licuado manzana y canela',items:['Leche descremada','Avena arrollada','Manzana','Miel'],grams:[250,40,150,10]},
     // DIFERENTES
-    {title:'Tostada con maní y banana',items:['Pan integral','Maní sin sal','Banana','Leche descremada'],grams:[90,30,100,150]},
-    {title:'Pan con queso y fruta',items:['Pan integral','Queso semidescremado','Naranja','Leche descremada'],grams:[90,60,200,150]},
-    {title:'Tostada con queso y palta',items:['Pan integral','Queso semidescremado','Palta','Leche descremada'],grams:[60,40,60,150]},
-    {title:'Bowl árabe sin pepino',items:['Pan integral','Ricota descremada','Tomate','Aceite de oliva'],grams:[60,80,80,10]},
-    {title:'Tostada queso, palta y huevo',items:['Pan integral','Palta','Queso semidescremado','Huevo entero','Leche descremada'],grams:[60,80,30,50,150]},
-    {title:'Tostada con ricota y fruta',items:['Pan integral','Ricota descremada','Frutilla','Miel','Leche descremada'],grams:[60,80,100,10,150]},
-    {title:'Tostada con queso y dulce',items:['Pan integral','Queso semidescremado','Mermelada','Leche descremada'],grams:[90,60,20,150]},
+    {title:'Tostada con maní y banana',items:['Pan integral','Maní sin sal','Banana','Café con leche desc (200ml)'],grams:[90,30,100,200]},
+    {title:'Pan con queso y fruta',items:['Pan integral','Queso semidescremado','Naranja','Café con leche desc (200ml)'],grams:[90,60,200,200]},
+    {title:'Tostada con queso y palta',items:['Pan integral','Queso semidescremado','Palta','Café con leche desc (200ml)'],grams:[60,40,60,200]},
+    {title:'Tostada queso palta y huevo',items:['Pan integral','Palta','Queso semidescremado','Huevo entero','Café con leche desc (200ml)'],grams:[60,80,30,50,200]},
+    {title:'Tostada con ricota y fruta',items:['Pan integral','Ricota descremada','Frutilla','Miel','Café con leche desc (200ml)'],grams:[60,80,100,10,200]},
+    {title:'Tostada con queso y dulce',items:['Pan integral','Queso semidescremado','Mermelada','Café con leche desc (200ml)'],grams:[90,60,20,200]},
+    {title:'Tostada con queso y dulce de batata',items:['Pan integral','Queso semidescremado','Dulce de batata','Café con leche desc (200ml)'],grams:[90,60,20,200]},
+    {title:'Tostada con queso y dulce de membrillo',items:['Pan integral','Queso semidescremado','Dulce de membrillo','Café con leche desc (200ml)'],grams:[90,60,20,200]},
   ],
   media:[
     {title:'Yogur con frutas y almendras',items:['Yogur griego','Manzana','Almendras'],grams:[200,150,15]},
@@ -796,54 +910,21 @@ const MEAL_TEMPLATES = {
     {title:'3 galletas de avena con manzana',items:['Avena arrollada','Manzana','Miel','Aceite de girasol'],grams:[37,30,5,4]},
     {title:'3 bocaditos de avena y chocolate',items:['Avena arrollada','Maní sin sal','Chocolate negro 70%','Miel'],grams:[30,12,10,6]},
     {title:'Overnight oats para llevar',items:['Avena arrollada','Yogur griego','Leche descremada','Banana','Nueces','Miel'],grams:[50,150,100,100,20,10]},
-  ],
-  preentreno:[
-    // NATACIÓN
-    {title:'Pre natación: tostada con miel',items:['Pan integral','Miel','Banana','Leche descremada'],grams:[90,15,100,150],tipo:'swim'},
-    {title:'Pre natación: avena con banana',items:['Avena arrollada','Leche descremada','Banana','Miel'],grams:[60,200,100,15],tipo:'swim'},
-    {title:'Pre natación: yogur con granola',items:['Yogur descremado','Granola','Banana','Miel'],grams:[200,40,100,10],tipo:'swim'},
-    {title:'Pre natación: pan con mermelada',items:['Pan integral','Mermelada','Naranja','Yogur descremado'],grams:[120,25,200,150],tipo:'swim'},
-    {title:'Pre natación: licuado de banana',items:['Leche descremada','Banana','Avena arrollada','Miel'],grams:[250,120,50,10],tipo:'swim'},
-    {title:'Pre natación: banana con yogur',items:['Banana','Yogur descremado','Miel'],grams:[150,200,15],tipo:'swim'},
-    {title:'Pre natación: tostada con ricota',items:['Pan integral','Ricota descremada','Banana','Miel'],grams:[90,60,100,10],tipo:'swim'},
-    {title:'Pre natación: pancakes con fruta',items:['Avena arrollada','Huevo entero','Banana','Miel','Durazno'],grams:[50,50,80,15,120],tipo:'swim'},
-    {title:'Pre natación: chia pudding',items:['Semillas de chía','Leche descremada','Yogur descremado','Banana','Miel'],grams:[20,250,150,100,10],tipo:'swim'},
-    {title:'Pre natación: granola con fruta',items:['Granola','Yogur descremado','Naranja','Miel'],grams:[50,200,150,10],tipo:'swim'},
-    {title:'Pre natación: avena con manzana',items:['Avena arrollada','Leche descremada','Manzana','Miel'],grams:[60,200,150,15],tipo:'swim'},
-    {title:'Pre natación: fruta abundante',items:['Banana','Manzana','Naranja','Yogur descremado'],grams:[100,150,150,150],tipo:'swim'},
-    // MUSCULACIÓN
-    {title:'Pre musculación: yogur con banana',items:['Yogur griego','Banana','Maní sin sal'],grams:[200,120,30],tipo:'gym'},
-    {title:'Pre musculación: bowl con granola',items:['Yogur griego','Granola','Almendras','Miel'],grams:[200,40,20,10],tipo:'gym'},
-    {title:'Pre musculación: avena con yogur',items:['Avena arrollada','Yogur griego','Leche descremada','Banana','Miel'],grams:[50,150,100,100,10],tipo:'gym'},
-    {title:'Pre musculación: licuado proteico',items:['Leche descremada','Yogur griego','Banana','Maní sin sal','Avena arrollada'],grams:[250,150,100,25,30],tipo:'gym'},
-    {title:'Pre musculación: overnight oats',items:['Avena arrollada','Yogur griego','Leche descremada','Banana','Nueces'],grams:[50,150,100,100,20],tipo:'gym'},
-    {title:'Pre musculación: budín y yogur',items:['Avena arrollada','Yogur griego','Banana','Huevo entero','Miel'],grams:[25,200,80,37,8],tipo:'gym'},
-    {title:'Pre musculación: galletas y yogur',items:['Avena arrollada','Yogur griego','Banana','Miel'],grams:[37,200,100,10],tipo:'gym'},
-    {title:'Pre musculación: queso con fruta',items:['Queso semidescremado','Manzana','Pera','Almendras'],grams:[60,150,150,20],tipo:'gym'},
-    {title:'Pre musculación: ricota con fruta',items:['Ricota descremada','Banana','Nueces','Miel'],grams:[150,100,25,10],tipo:'gym'},
-    {title:'Pre musculación: avena con nueces',items:['Avena arrollada','Leche descremada','Almendras','Nueces','Miel'],grams:[60,200,20,15,15],tipo:'gym'},
-  ],
-  postentreno:[
-    // NATACIÓN
-    {title:'Post natación: wrap de pollo',items:['Tortilla integral','Pechuga de pollo','Palta','Tomate','Lechuga'],grams:[60,120,60,50,30],tipo:'swim'},
-    {title:'Post natación: yogur con granola',items:['Yogur griego','Granola','Banana','Miel'],grams:[200,40,100,10],tipo:'swim'},
-    {title:'Post natación: whey con banana',items:['Whey protein (scoop)','Leche descremada','Banana'],grams:[30,250,150],tipo:'swim'},
-    {title:'Post natación: licuado de yogur',items:['Yogur griego','Leche descremada','Banana','Avena arrollada','Miel'],grams:[200,150,100,40,10],tipo:'swim'},
-    {title:'Post natación: tostada con queso',items:['Pan integral','Queso semidescremado','Manzana','Miel'],grams:[90,60,150,10],tipo:'swim'},
-    {title:'Post natación: ricota con fruta',items:['Ricota descremada','Granola','Frutilla','Miel'],grams:[150,40,150,15],tipo:'swim'},
-    {title:'Post natación: bowl de avena',items:['Avena arrollada','Leche descremada','Yogur griego','Banana','Miel'],grams:[60,200,100,100,10],tipo:'swim'},
-    {title:'Post natación: whey y galletas',items:['Whey protein (scoop)','Leche descremada','Avena arrollada','Banana'],grams:[30,250,37,80],tipo:'swim'},
-    // MUSCULACIÓN
-    {title:'Post musculación: whey con leche',items:['Whey protein (scoop)','Leche descremada','Banana','Maní sin sal'],grams:[30,250,100,20],tipo:'gym'},
-    {title:'Post musculación: wrap de pollo',items:['Tortilla integral','Pechuga de pollo','Palta','Tomate','Lechuga'],grams:[60,150,80,50,30],tipo:'gym'},
-    {title:'Post musculación: licuado proteico',items:['Whey protein (scoop)','Leche descremada','Yogur griego','Banana','Maní sin sal'],grams:[30,250,150,100,20],tipo:'gym'},
-    {title:'Post musculación: yogur y frutos',items:['Yogur griego','Almendras','Nueces','Miel','Banana'],grams:[200,25,20,15,100],tipo:'gym'},
-    {title:'Post musculación: overnight whey',items:['Whey protein (scoop)','Avena arrollada','Yogur griego','Leche descremada','Banana'],grams:[30,50,150,100,100],tipo:'gym'},
-    {title:'Post musculación: ricota y fruta',items:['Ricota descremada','Banana','Almendras','Nueces','Miel'],grams:[150,100,25,20,10],tipo:'gym'},
-    {title:'Post musculación: budín y yogur',items:['Yogur griego','Avena arrollada','Banana','Huevo entero','Miel'],grams:[200,25,80,37,8],tipo:'gym'},
-    {title:'Post musculación: queso y fruta',items:['Whey protein (scoop)','Queso semidescremado','Manzana','Nueces'],grams:[30,60,150,20],tipo:'gym'},
-    {title:'Post musculación: tostada ricota',items:['Pan integral','Ricota descremada','Huevo entero','Tomate'],grams:[90,100,100,80],tipo:'gym'},
-    {title:'Post musculación: budín y whey',items:['Whey protein (scoop)','Leche descremada','Avena arrollada','Banana','Yogur griego'],grams:[30,200,25,80,100],tipo:'gym'},
+    {title:'Yogur griego con arándanos',items:['Yogur griego','Arándano','Miel'],grams:[200,80,10]},
+    {title:'Tostada con ricota y mermelada',items:['Pan integral','Ricota descremada','Mermelada'],grams:[60,60,20]},
+    {title:'Licuado de banana y maní',items:['Leche descremada','Banana','Maní sin sal'],grams:[200,100,20]},
+    {title:'Licuado de yogur con fruta',items:['Yogur griego','Leche descremada','Frutilla','Miel'],grams:[150,100,100,10]},
+    {title:'Banana con almendras',items:['Banana','Almendras'],grams:[150,30]},
+    {title:'Bowl de avena y manzana',items:['Avena arrollada','Yogur descremado','Manzana'],grams:[40,150,120]},
+    {title:'2 galletas con yogur griego',items:['Avena arrollada','Yogur griego','Banana','Miel'],grams:[25,150,50,5]},
+    {title:'Frutos secos con yogur',items:['Nueces','Almendras','Yogur griego','Banana'],grams:[20,20,150,100]},
+    {title:'Ricota con miel y nueces',items:['Ricota descremada','Miel','Nueces','Naranja'],grams:[120,15,20,150]},
+    {title:'Café con leche y tostada',items:['Café con leche desc (200ml)','Pan integral','Miel'],grams:[200,60,10]},
+    {title:'Smoothie de mango y yogur',items:['Yogur griego','Mango','Leche descremada'],grams:[150,120,100]},
+    {title:'Pan con queso y dulce de membrillo',items:['Pan integral','Queso semidescremado','Dulce de membrillo'],grams:[60,40,20]},
+    {title:'Pan con queso y dulce de batata',items:['Pan integral','Queso semidescremado','Dulce de batata'],grams:[60,40,20]},
+    {title:'Overnight oats con mango',items:['Avena arrollada','Yogur griego','Leche descremada','Mango'],grams:[40,100,100,100]},
+    {title:'Bocaditos con café con leche',items:['Avena arrollada','Maní sin sal','Chocolate negro 70%','Miel','Café con leche desc (200ml)'],grams:[30,12,10,6,200]},
   ],
   almuerzo:[
     {title:'Pollo a la plancha con arroz',items:['Pechuga de pollo','Arroz blanco (crudo)','Lechuga','Tomate','Aceite de oliva'],grams:[180,55,80,100,10]},
@@ -866,6 +947,103 @@ const MEAL_TEMPLATES = {
     {title:'Milanesa napolitana al horno',items:['Milanesa de pollo','Tomate','Queso semidescremado','Papa'],grams:[180,80,30,150]},
     {title:'Revuelto con carne y papa',items:['Carne picada magra','Papa','Huevo entero','Aceite de oliva','Morrón rojo'],grams:[150,150,50,10,80]},
     {title:'Empanadas al horno (3u)',items:['Tapa de empanada (1u)','Carne picada magra','Cebolla','Morrón rojo','Aceite de oliva'],grams:[3,75,30,20,4]},
+    {title:'Pollo grillado con batata al horno',items:['Pechuga de pollo','Batata','Aceite de oliva'],grams:[180,200,10]},
+    {title:'Bowl de arroz con huevo y verduras',items:['Arroz blanco (crudo)','Huevo entero','Zanahoria','Zapallito','Aceite de oliva'],grams:[55,100,100,100,10]},
+    {title:'Lomo con papa y tomate',items:['Bife de lomo','Papa','Tomate','Aceite de oliva'],grams:[180,150,80,10]},
+    {title:'Milanesa de carne con puré',items:['Milanesa de carne','Papa','Leche descremada','Aceite de oliva'],grams:[180,150,50,5]},
+    {title:'Fideos con pesto y queso',items:['Fideos secos (crudo)','Aceite de oliva','Queso semidescremado'],grams:[80,15,40]},
+    {title:'Cazuela de lentejas',items:['Lentejas (cocidas)','Zanahoria','Cebolla','Tomate','Aceite de oliva'],grams:[200,80,50,80,10]},
+    {title:'Sándwich de milanesa',items:['Milanesa de pollo','Pan integral','Tomate','Lechuga'],grams:[150,90,60,30]},
+    {title:'Revuelto de huevo con arroz',items:['Huevo entero','Arroz blanco (crudo)','Morrón rojo','Aceite de oliva'],grams:[150,55,80,10]},
+    {title:'Pollo al horno con choclo y ensalada',items:['Pechuga de pollo','Choclo','Lechuga','Aceite de oliva'],grams:[180,100,80,10]},
+    {title:'Pollo con fideos y tomate',items:['Pechuga de pollo','Fideos secos (crudo)','Tomate','Aceite de oliva'],grams:[150,70,100,10]},
+  ],
+  preentreno:[
+    // NATACIÓN
+    {title:'Pre natación: tostada con miel',items:['Pan integral','Miel','Banana','Café con leche desc (200ml)'],grams:[90,15,100,200],tipo:'swim'},
+    {title:'Pre natación: avena con banana',items:['Avena arrollada','Leche descremada','Banana','Miel'],grams:[60,200,100,15],tipo:'swim'},
+    {title:'Pre natación: yogur con granola',items:['Yogur descremado','Granola','Banana','Miel'],grams:[200,40,100,10],tipo:'swim'},
+    {title:'Pre natación: pan con mermelada',items:['Pan integral','Mermelada','Naranja','Yogur descremado'],grams:[120,25,200,150],tipo:'swim'},
+    {title:'Pre natación: licuado de banana',items:['Leche descremada','Banana','Avena arrollada','Miel'],grams:[250,120,50,10],tipo:'swim'},
+    {title:'Pre natación: banana con yogur',items:['Banana','Yogur descremado','Miel'],grams:[150,200,15],tipo:'swim'},
+    {title:'Pre natación: tostada con ricota',items:['Pan integral','Ricota descremada','Banana','Miel'],grams:[90,60,100,10],tipo:'swim'},
+    {title:'Pre natación: pancakes con fruta',items:['Avena arrollada','Huevo entero','Banana','Miel','Durazno'],grams:[50,50,80,15,120],tipo:'swim'},
+    {title:'Pre natación: chia pudding',items:['Semillas de chía','Leche descremada','Yogur descremado','Banana','Miel'],grams:[20,250,150,100,10],tipo:'swim'},
+    {title:'Pre natación: granola con fruta',items:['Granola','Yogur descremado','Naranja','Miel'],grams:[50,200,150,10],tipo:'swim'},
+    {title:'Pre natación: avena con manzana',items:['Avena arrollada','Leche descremada','Manzana','Miel'],grams:[60,200,150,15],tipo:'swim'},
+    {title:'Pre natación: fruta abundante',items:['Banana','Manzana','Naranja','Yogur descremado'],grams:[100,150,150,150],tipo:'swim'},
+    {title:'Pre natación: porridge con banana',items:['Avena arrollada','Leche descremada','Banana','Miel'],grams:[60,250,100,10],tipo:'swim'},
+    {title:'Pre natación: tostada con dulce y café',items:['Pan integral','Dulce de batata','Café con leche desc (200ml)'],grams:[90,25,200],tipo:'swim'},
+    {title:'Pre natación: bowl fruta y granola',items:['Frutilla','Banana','Yogur descremado','Granola'],grams:[150,80,200,30],tipo:'swim'},
+    {title:'Pre natación: tostada ricota mermelada',items:['Pan integral','Ricota descremada','Mermelada','Café con leche desc (200ml)'],grams:[90,60,20,200],tipo:'swim'},
+    {title:'Pre natación: licuado de leche y banana',items:['Leche descremada','Banana','Miel'],grams:[300,120,10],tipo:'swim'},
+    {title:'Pre natación: tostada con dulce de membrillo',items:['Pan integral','Dulce de membrillo','Café con leche desc (200ml)'],grams:[90,25,200],tipo:'swim'},
+    {title:'Pre natación: yogur con banana y miel',items:['Yogur descremado','Banana','Miel'],grams:[200,150,15],tipo:'swim'},
+    {title:'Pre natación: arroz con leche y banana',items:['Arroz blanco (crudo)','Leche descremada','Banana','Miel'],grams:[45,150,100,10],tipo:'swim'},
+    {title:'Pre natación: licuado de durazno',items:['Yogur descremado','Durazno','Leche descremada','Miel'],grams:[200,150,150,10],tipo:'swim'},
+    {title:'Pre natación: pancakes con durazno',items:['Avena arrollada','Huevo entero','Banana','Miel','Durazno'],grams:[50,50,60,15,150],tipo:'swim'},
+    // MUSCULACIÓN
+    {title:'Pre musculación: yogur con banana',items:['Yogur griego','Banana','Maní sin sal'],grams:[200,120,30],tipo:'gym'},
+    {title:'Pre musculación: bowl con granola',items:['Yogur griego','Granola','Almendras','Miel'],grams:[200,40,20,10],tipo:'gym'},
+    {title:'Pre musculación: avena con yogur',items:['Avena arrollada','Yogur griego','Leche descremada','Banana','Miel'],grams:[50,150,100,100,10],tipo:'gym'},
+    {title:'Pre musculación: licuado proteico',items:['Leche descremada','Yogur griego','Banana','Maní sin sal','Avena arrollada'],grams:[250,150,100,25,30],tipo:'gym'},
+    {title:'Pre musculación: overnight oats',items:['Avena arrollada','Yogur griego','Leche descremada','Banana','Nueces'],grams:[50,150,100,100,20],tipo:'gym'},
+    {title:'Pre musculación: budín y yogur',items:['Avena arrollada','Yogur griego','Banana','Huevo entero','Miel'],grams:[25,200,80,37,8],tipo:'gym'},
+    {title:'Pre musculación: galletas y yogur',items:['Avena arrollada','Yogur griego','Banana','Miel'],grams:[37,200,100,10],tipo:'gym'},
+    {title:'Pre musculación: queso con fruta',items:['Queso semidescremado','Manzana','Pera','Almendras'],grams:[60,150,150,20],tipo:'gym'},
+    {title:'Pre musculación: ricota con fruta',items:['Ricota descremada','Banana','Nueces','Miel'],grams:[150,100,25,10],tipo:'gym'},
+    {title:'Pre musculación: avena con nueces',items:['Avena arrollada','Leche descremada','Almendras','Nueces','Miel'],grams:[60,200,20,15,15],tipo:'gym'},
+    {title:'Pre musculación: yogur granola naranja',items:['Yogur griego','Granola','Naranja'],grams:[200,40,200],tipo:'gym'},
+    {title:'Pre musculación: avena leche y frutos secos',items:['Avena arrollada','Leche descremada','Almendras','Nueces','Miel'],grams:[60,250,20,15,10],tipo:'gym'},
+    {title:'Pre musculación: ricota maní banana',items:['Pan integral','Ricota descremada','Maní sin sal','Banana'],grams:[60,60,20,80],tipo:'gym'},
+    {title:'Pre musculación: café avena y yogur',items:['Café con leche desc (200ml)','Avena arrollada','Yogur griego','Miel'],grams:[200,50,150,10],tipo:'gym'},
+    {title:'Pre musculación: banana nueces yogur',items:['Banana','Nueces','Yogur griego','Miel'],grams:[150,25,200,10],tipo:'gym'},
+    {title:'Pre musculación: overnight maní',items:['Avena arrollada','Yogur griego','Leche descremada','Maní sin sal','Banana'],grams:[50,150,100,20,80],tipo:'gym'},
+    {title:'Pre musculación: ricota granola banana',items:['Ricota descremada','Granola','Banana','Miel'],grams:[150,40,100,10],tipo:'gym'},
+    {title:'Pre musculación: tostada queso dulce batata',items:['Pan integral','Queso semidescremado','Dulce de batata','Café con leche desc (200ml)'],grams:[90,60,20,200],tipo:'gym'},
+    {title:'Pre musculación: avena leche maní banana',items:['Avena arrollada','Leche descremada','Banana','Maní sin sal'],grams:[60,250,100,20],tipo:'gym'},
+    {title:'Pre musculación: yogur bocaditos naranja',items:['Yogur griego','Avena arrollada','Maní sin sal','Chocolate negro 70%','Naranja'],grams:[200,30,12,10,150],tipo:'gym'},
+  ],
+  postentreno:[
+    // NATACIÓN
+    {title:'Post natación: wrap de pollo',items:['Tortilla integral','Pechuga de pollo','Palta','Tomate','Lechuga'],grams:[60,120,60,50,30],tipo:'swim'},
+    {title:'Post natación: yogur con granola',items:['Yogur griego','Granola','Banana','Miel'],grams:[200,40,100,10],tipo:'swim'},
+    {title:'Post natación: whey con banana',items:['Batido de whey con leche desc (300ml)','Banana'],grams:[300,150],tipo:'swim'},
+    {title:'Post natación: licuado de yogur',items:['Yogur griego','Leche descremada','Banana','Avena arrollada','Miel'],grams:[200,150,100,40,10],tipo:'swim'},
+    {title:'Post natación: tostada con queso',items:['Pan integral','Queso semidescremado','Manzana','Miel'],grams:[90,60,150,10],tipo:'swim'},
+    {title:'Post natación: ricota con fruta',items:['Ricota descremada','Granola','Frutilla','Miel'],grams:[150,40,150,15],tipo:'swim'},
+    {title:'Post natación: bowl de avena',items:['Avena arrollada','Leche descremada','Yogur griego','Banana','Miel'],grams:[60,200,100,100,10],tipo:'swim'},
+    {title:'Post natación: whey y galletas',items:['Batido de whey con leche desc (300ml)','Avena arrollada','Banana'],grams:[300,37,80],tipo:'swim'},
+    {title:'Post natación: café con budín y banana',items:['Café con leche desc (200ml)','Avena arrollada','Banana','Huevo entero','Miel'],grams:[200,25,100,37,8],tipo:'swim'},
+    {title:'Post natación: licuado banana y avena',items:['Leche descremada','Banana','Avena arrollada','Miel'],grams:[300,120,40,10],tipo:'swim'},
+    {title:'Post natación: yogur granola abundante',items:['Yogur descremado','Granola','Banana','Miel'],grams:[200,50,120,10],tipo:'swim'},
+    {title:'Post natación: tostada queso huevo café',items:['Pan integral','Queso semidescremado','Huevo entero','Café con leche desc (200ml)'],grams:[60,40,50,200],tipo:'swim'},
+    {title:'Post natación: smoothie bowl banana',items:['Yogur griego','Banana','Frutilla','Granola'],grams:[200,100,100,30],tipo:'swim'},
+    {title:'Post natación: bowl avena y fruta',items:['Avena arrollada','Leche descremada','Frutilla','Miel'],grams:[60,250,150,10],tipo:'swim'},
+    {title:'Post natación: licuado yogur banana',items:['Yogur griego','Banana','Avena arrollada','Leche descremada'],grams:[150,100,40,150],tipo:'swim'},
+    {title:'Post natación: tostada ricota mermelada',items:['Pan integral','Ricota descremada','Mermelada','Café con leche desc (200ml)'],grams:[90,80,20,200],tipo:'swim'},
+    {title:'Post natación: yogur bocaditos banana',items:['Yogur griego','Avena arrollada','Maní sin sal','Chocolate negro 70%','Banana'],grams:[200,30,12,10,100],tipo:'swim'},
+    {title:'Post natación: tostada dulce batata',items:['Pan integral','Dulce de batata','Yogur descremado','Café con leche desc (200ml)'],grams:[90,25,150,200],tipo:'swim'},
+    // MUSCULACIÓN
+    {title:'Post musculación: whey con leche',items:['Batido de whey con leche desc (300ml)','Banana','Maní sin sal'],grams:[300,100,20],tipo:'gym'},
+    {title:'Post musculación: wrap de pollo',items:['Tortilla integral','Pechuga de pollo','Palta','Tomate','Lechuga'],grams:[60,150,80,50,30],tipo:'gym'},
+    {title:'Post musculación: licuado proteico',items:['Batido de whey con leche desc (300ml)','Yogur griego','Banana','Maní sin sal'],grams:[300,150,100,20],tipo:'gym'},
+    {title:'Post musculación: yogur y frutos secos',items:['Yogur griego','Almendras','Nueces','Miel','Banana'],grams:[200,25,20,15,100],tipo:'gym'},
+    {title:'Post musculación: overnight whey',items:['Batido de whey con agua (300ml)','Avena arrollada','Yogur griego','Leche descremada','Banana'],grams:[300,50,150,100,100],tipo:'gym'},
+    {title:'Post musculación: ricota y fruta',items:['Ricota descremada','Banana','Almendras','Nueces','Miel'],grams:[150,100,25,20,10],tipo:'gym'},
+    {title:'Post musculación: budín y yogur',items:['Yogur griego','Avena arrollada','Banana','Huevo entero','Miel'],grams:[200,25,80,37,8],tipo:'gym'},
+    {title:'Post musculación: queso y fruta',items:['Batido de whey con agua (300ml)','Queso semidescremado','Manzana','Nueces'],grams:[300,60,150,20],tipo:'gym'},
+    {title:'Post musculación: tostada ricota huevo',items:['Pan integral','Ricota descremada','Huevo entero','Tomate'],grams:[90,100,100,80],tipo:'gym'},
+    {title:'Post musculación: budín y whey',items:['Batido de whey con leche desc (300ml)','Avena arrollada','Banana','Yogur griego'],grams:[300,25,80,100],tipo:'gym'},
+    {title:'Post musculación: batido whey con galletas',items:['Batido de whey con leche desc (300ml)','Avena arrollada','Miel'],grams:[300,37,10],tipo:'gym'},
+    {title:'Post musculación: yogur queso manzana',items:['Yogur griego','Queso semidescremado','Manzana','Nueces'],grams:[150,30,150,20],tipo:'gym'},
+    {title:'Post musculación: café tostada huevo queso',items:['Café con leche desc (200ml)','Pan integral','Huevo entero','Queso semidescremado'],grams:[200,60,50,30],tipo:'gym'},
+    {title:'Post musculación: ricota maní banana',items:['Ricota descremada','Maní sin sal','Banana','Miel'],grams:[150,25,120,10],tipo:'gym'},
+    {title:'Post musculación: whey fruta almendras',items:['Batido de whey con leche desc (300ml)','Manzana','Almendras'],grams:[300,150,25],tipo:'gym'},
+    {title:'Post musculación: tostada palta huevo queso',items:['Pan integral','Palta','Huevo entero','Queso semidescremado'],grams:[60,60,50,30],tipo:'gym'},
+    {title:'Post musculación: yogur bocaditos café',items:['Yogur griego','Avena arrollada','Maní sin sal','Chocolate negro 70%','Café con leche desc (200ml)'],grams:[200,30,12,10,200],tipo:'gym'},
+    {title:'Post musculación: revuelto pan y café',items:['Huevo entero','Pan integral','Queso semidescremado','Café con leche desc (200ml)'],grams:[150,60,20,200],tipo:'gym'},
+    {title:'Post musculación: whey tostada dulce batata',items:['Batido de whey con leche desc (300ml)','Pan integral','Dulce de batata'],grams:[300,60,20],tipo:'gym'},
   ],
   cena:[
     {title:'Pollo con vegetales salteados',items:['Pechuga de pollo','Zapallito','Morrón rojo','Espinaca','Aceite de oliva'],grams:[180,150,100,80,10]},
@@ -879,14 +1057,23 @@ const MEAL_TEMPLATES = {
     {title:'Fideos con pollo y tomate',items:['Fideos secos (crudo)','Pechuga de pollo','Tomate','Aceite de oliva'],grams:[70,150,100,10]},
     {title:'Sopa de verduras con pollo',items:['Pechuga de pollo','Arroz blanco (crudo)','Zanahoria','Zapallo','Chaucha','Aceite de oliva'],grams:[150,40,100,100,80,5]},
     {title:'Pollo al horno con batata',items:['Pechuga de pollo','Batata','Morrón rojo','Aceite de oliva'],grams:[180,150,100,10]},
-    {title:'Wrap de pollo y palta (cena)',items:['Tortilla integral','Pechuga de pollo','Palta','Tomate','Lechuga'],grams:[60,150,80,50,30]},
+    {title:'Wrap de pollo y palta',items:['Tortilla integral','Pechuga de pollo','Palta','Tomate','Lechuga'],grams:[60,150,80,50,30]},
     {title:'Tarta de atún (1 porción)',items:['Pan integral','Atún al natural (lata)','Huevo entero','Tomate','Cebolla','Aceite de oliva'],grams:[25,80,50,50,13,2]},
     {title:'Tarta de jamón y queso (1 porción)',items:['Pan integral','Huevo entero','Leche descremada','Queso semidescremado'],grams:[25,50,50,40]},
     {title:'Pastel de papa (1 porción)',items:['Carne picada magra','Papa','Leche descremada','Huevo entero','Cebolla','Aceite de oliva'],grams:[100,150,25,12,20,4]},
     {title:'Pollo a la plancha liviano',items:['Pechuga de pollo','Zapallito','Espinaca','Aceite de oliva'],grams:[180,150,80,10]},
+    {title:'Tortilla de papa',items:['Huevo entero','Papa','Cebolla','Aceite de oliva'],grams:[150,150,60,10]},
+    {title:'Pollo al limón con brócoli',items:['Pechuga de pollo','Brócoli','Aceite de oliva'],grams:[180,200,10]},
+    {title:'Fideos con atún y tomate',items:['Fideos secos (crudo)','Atún al natural (lata)','Tomate','Aceite de oliva'],grams:[70,120,100,10]},
+    {title:'Carne con puré de zanahoria',items:['Nalga','Zanahoria','Aceite de oliva'],grams:[180,200,10]},
+    {title:'Pollo con polenta y zapallo',items:['Pechuga de pollo','Polenta (cruda)','Zapallo','Aceite de oliva'],grams:[150,45,150,10]},
+    {title:'Ensalada de pollo con palta',items:['Pechuga de pollo','Lechuga','Palta','Tomate','Aceite de oliva'],grams:[150,100,80,80,5]},
+    {title:'Huevos a la plancha con batata',items:['Huevo entero','Batata','Aceite de oliva'],grams:[150,150,5]},
+    {title:'Carne picada con vegetales',items:['Carne picada magra','Zapallito','Morrón rojo','Tomate','Aceite de oliva'],grams:[150,150,100,80,10]},
+    {title:'Merluza al horno con batata',items:['Merluza','Batata','Aceite de oliva'],grams:[180,150,10]},
+    {title:'Sopa de pollo con arroz',items:['Pechuga de pollo','Arroz blanco (crudo)','Zanahoria','Chaucha','Aceite de oliva'],grams:[120,40,80,80,5]},
   ],
 };
-
 const DEFAULT_GRAMS = {
   'Pechuga de pollo':150,'Bife de cuadril':150,'Bife de lomo':150,'Nalga':150,
   'Carne picada magra':150,'Merluza':180,'Atún al natural (lata)':80,
@@ -898,13 +1085,21 @@ const DEFAULT_GRAMS = {
   'Brócoli':150,'Espinaca':100,'Zapallito':150,'Lechuga':80,'Tomate':100,
   'Morrón rojo':100,'Morrón verde':100,'Zanahoria':100,'Zapallo':100,
   'Banana':100,'Manzana':150,'Naranja':150,'Mandarina':120,'Frutilla':150,
-  'Kiwi':100,'Durazno':120,'Pera':150,
+  'Kiwi':100,'Durazno':120,'Pera':150,'Mango':120,'Arándano':80,
   'Yogur descremado':200,'Yogur griego':150,'Leche descremada':200,
   'Palta':60,'Aceite de oliva':10,'Miel':15,'Mermelada':20,
   'Almendras':30,'Nueces':30,'Maní sin sal':30,'Castañas de cajú':30,
   'Semillas de chía':15,'Queso semidescremado':60,'Ricota descremada':100,
   'Hummus':60,'Chocolate negro 70%':30,'Coco rallado':20,
   'Whey protein (scoop)':30,
+  'Dulce de batata':20,'Dulce de membrillo':20,'Dulce de leche':15,
+  'Café con leche desc (200ml)':200,'Café con leche entera (200ml)':200,
+  'Té solo (200ml)':200,'Té con leche desc (200ml)':200,
+  'Mate (cebado, 200ml)':200,'Café solo (100ml)':100,
+  'Batido de whey con leche desc (300ml)':300,'Batido de whey con agua (300ml)':300,
+  'Batido de yogur y fruta (300ml)':300,'Licuado de banana y leche (300ml)':300,
+  'Leche chocolatada desc (200ml)':200,'Jugo de naranja natural (200ml)':200,
+  'Cebolla':60,'Chaucha':80,'Lentejas (cocidas)':200,
 };
 
 function getGrams(name){return DEFAULT_GRAMS[name]||100;}
@@ -1692,6 +1887,35 @@ const BUILT_IN_RECIPES = [
     notes:'1 porción ≈ 420 kcal. Guardá en heladera hasta 4 días.',
     builtin:true,
   },
+  {
+    id:'r_budin_pro',emoji:'💪',name:'Budín PRO (versión deportiva)',servings:10,
+    ingredients:[
+      {name:'Banana',grams:200,note:'2 bananas maduras'},
+      {name:'Huevo entero',grams:100,note:'2 huevos enteros'},
+      {name:'Clara de huevo',grams:60,note:'2 claras'},
+      {name:'Avena arrollada',grams:80,note:'¾ taza'},
+      {name:'Almendras',grams:20,note:'Harina de almendras (procesás almendras) o comprás hecha'},
+      {name:'Ricota descremada',grams:120,note:'½ taza'},
+      {name:'Leche descremada',grams:40,note:'3 cdas'},
+      {name:'Whey protein (scoop)',grams:30,note:'1 scoop (sabor vainilla o neutro)'},
+      {name:'Miel',grams:10,note:'1 cdita'},
+      {name:'Chocolate negro 70%',grams:20,note:'En trozos'},
+      {name:'Nueces',grams:10,note:'Picadas grueso (o mix de frutos secos)'},
+    ],
+    steps:'1. Precalentás el horno a 180°
+2. Pisás las bananas hasta puré
+3. Agregás los 2 huevos enteros y las 2 claras, mezclás bien
+4. Sumás la ricota, la leche y la miel
+5. Incorporás la avena, la harina de almendras, el whey y la canela a gusto
+6. Agregás el polvo de hornear (1 cdita) y mezclás
+7. Incorporás el chocolate en trozos y los frutos secos
+8. Volcás en molde enmantecado o con papel manteca
+9. Horno 180° por 35-40 minutos
+10. Pinchás con palillo — si sale limpio está listo
+11. Dejás enfriar antes de cortar. Heladera hasta 6 días',
+    notes:'~129 kcal y 8g de proteína por porción. Mucho más proteico que el budín clásico. Podés reemplazar la harina de almendras por más avena si no tenés. El whey de vainilla le da buen sabor sin azúcar extra.',
+    builtin:true,
+  },
 ];
 
 function renderRecipes(){
@@ -2244,9 +2468,156 @@ function saveHistoryNote(dateStr){
 }
 
 // ══════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════════════
+const NOTIF_KEY='nt:notifs';
+const NOTIF_DEFAULTS={
+  desayuno:{on:false,time:'09:00'},
+  media:{on:false,time:'11:00'},
+  preentreno:{on:false,time:'16:00'},
+  cena:{on:false,time:'21:00'},
+  peso:{on:false,time:'09:00'},
+};
+
+function loadNotifSettings(){
+  return lsGet(NOTIF_KEY, JSON.parse(JSON.stringify(NOTIF_DEFAULTS)));
+}
+
+function saveNotifSettings(){
+  const settings=loadNotifSettings();
+  ['desayuno','media','preentreno','cena','peso'].forEach(key=>{
+    const timeEl=document.getElementById('ntime-'+key);
+    if(timeEl) settings[key].time=timeEl.value;
+  });
+  lsSet(NOTIF_KEY,settings);
+  scheduleAllNotifications();
+}
+
+function toggleNotif(key){
+  const settings=loadNotifSettings();
+  settings[key].on=!settings[key].on;
+  lsSet(NOTIF_KEY,settings);
+  renderNotifToggles();
+  if(settings[key].on){
+    checkNotifPermission();
+    scheduleAllNotifications();
+    showToast('🔔 Recordatorio activado');
+  } else {
+    showToast('🔕 Recordatorio desactivado');
+  }
+}
+
+function renderNotifToggles(){
+  const settings=loadNotifSettings();
+  ['desayuno','media','preentreno','cena','peso'].forEach(key=>{
+    const toggle=document.getElementById('ntoggle-'+key);
+    if(!toggle)return;
+    if(settings[key].on) toggle.classList.add('on');
+    else toggle.classList.remove('on');
+    const timeEl=document.getElementById('ntime-'+key);
+    if(timeEl) timeEl.value=settings[key].time;
+  });
+}
+
+function checkNotifPermission(){
+  if(!('Notification' in window)){return;}
+  const btn=document.getElementById('notifGrantBtn');
+  if(Notification.permission==='default'){
+    if(btn)btn.style.display='block';
+  } else {
+    if(btn)btn.style.display='none';
+  }
+}
+
+function requestNotifPermission(){
+  if(!('Notification' in window)){
+    showToast('Tu navegador no soporta notificaciones','err');
+    return;
+  }
+  Notification.requestPermission().then(perm=>{
+    checkNotifPermission();
+    if(perm==='granted'){
+      showToast('✅ Notificaciones activadas');
+      scheduleAllNotifications();
+    } else {
+      showToast('⚠️ Permiso denegado — activalo desde Ajustes → NutriTrack → Notificaciones','err');
+    }
+  });
+}
+
+function scheduleAllNotifications(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  // Clear existing scheduled notifications (we use setTimeout approach)
+  // Cancel old timers
+  if(window._notifTimers){
+    window._notifTimers.forEach(t=>clearTimeout(t));
+  }
+  window._notifTimers=[];
+
+  const settings=loadNotifSettings();
+  const now=new Date();
+
+  const NOTIF_CONFIG={
+    desayuno:{title:'☀️ ¿Ya cargaste el desayuno?',body:'Buen momento para registrar lo que comiste.'},
+    media:{title:'🍎 Media mañana',body:'¿Comiste algo? Registralo en NutriTrack.'},
+    preentreno:{title:'⚡ Pre-entreno en camino',body:'Acordate de comer 1 hora antes de entrenar.'},
+    cena:{title:'🌙 Hora de la cena',body:'Registrá la cena para cerrar el día.'},
+    peso:{title:'⚖️ ¡Momento de pesarte!',body:'Pasaron 2 semanas desde tu último pesaje.'},
+  };
+
+  Object.entries(settings).forEach(([key,cfg])=>{
+    if(!cfg.on)return;
+    if(key==='peso'){
+      // Schedule peso only if 14 days have passed
+      if(!weightData.length)return;
+      const last=weightData[weightData.length-1];
+      const lastDate=new Date(last.date+'T12:00:00');
+      const nextDate=new Date(lastDate);
+      nextDate.setDate(lastDate.getDate()+14);
+      const msUntil=nextDate-now;
+      if(msUntil>0){
+        const t=setTimeout(()=>fireNotif(NOTIF_CONFIG[key]),msUntil);
+        window._notifTimers.push(t);
+      }
+      return;
+    }
+    // Schedule daily notifications
+    const [h,m]=cfg.time.split(':').map(Number);
+    const target=new Date(now);
+    target.setHours(h,m,0,0);
+    if(target<=now) target.setDate(target.getDate()+1);
+    const msUntil=target-now;
+    const t=setTimeout(()=>{
+      fireNotif(NOTIF_CONFIG[key]);
+      // Re-schedule for next day
+      const daily=setInterval(()=>fireNotif(NOTIF_CONFIG[key]),24*60*60*1000);
+      window._notifTimers.push(daily);
+    },msUntil);
+    window._notifTimers.push(t);
+  });
+}
+
+function fireNotif(cfg){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  try{
+    new Notification(cfg.title,{
+      body:cfg.body,
+      icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="%230b0e17"/><text y="24" x="16" text-anchor="middle" font-size="22">🥗</text></svg>',
+      badge:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="%230b0e17"/></svg>',
+      tag:'nutritrack-'+cfg.title,
+      renotify:true,
+    });
+  }catch(e){console.log('Notif error:',e);}
+}
+
+// ══════════════════════════════════════════════════
 //  SETTINGS
 // ══════════════════════════════════════════════════
-function openSettings(){document.getElementById('settingsModal').classList.remove('hidden');}
+function openSettings(){
+  document.getElementById('settingsModal').classList.remove('hidden');
+  try{renderNotifToggles();}catch(e){}
+  try{checkNotifPermission();}catch(e){}
+}
 function closeSettings(){document.getElementById('settingsModal').classList.add('hidden');}
 function closeSettingsOutside(e){if(e.target.id==='settingsModal')closeSettings();}
 function clearAllData(){
@@ -2268,24 +2639,64 @@ function loadEnergyForDate(d){
 
 function setEnergy(level){
   const data=lsGet(ENERGY_KEY,{});
-  if(data[currentDate]===level){
+  if(data[currentDate]&&data[currentDate].level===level){
     delete data[currentDate]; // toggle off
-  } else {
-    data[currentDate]=level;
+    lsSet(ENERGY_KEY,data);
+    renderEnergyButtons();
+    renderEnergyWeek();
+    showEnergyNoteArea(false);
+    showToast('Energía eliminada');
+    return;
   }
+  if(!data[currentDate])data[currentDate]={level:null,note:''};
+  data[currentDate].level=level;
   lsSet(ENERGY_KEY,data);
   renderEnergyButtons();
   renderEnergyWeek();
-  showToast(data[currentDate]?'Energía: '+{low:'Baja',ok:'Normal',high:'Alta'}[data[currentDate]]:'Energía eliminada');
+  showEnergyNoteArea(true);
+  showToast('Energía: '+{low:'Baja',ok:'Normal',high:'Alta'}[level]);
+}
+
+function showEnergyNoteArea(show){
+  const wrap=document.getElementById('energyNoteWrap');
+  if(!wrap)return;
+  wrap.style.display=show?'block':'none';
+  if(show){
+    const data=lsGet(ENERGY_KEY,{});
+    const day=data[currentDate];
+    const inp=document.getElementById('energyNoteInp');
+    const meta=document.getElementById('energyNoteMeta');
+    if(inp)inp.value=(day&&day.note)||'';
+    if(meta&&day){
+      const icons={low:'😴',ok:'😐',high:'⚡'};
+      const labels={low:'Bajo',ok:'Normal',high:'Alto'};
+      meta.textContent=icons[day.level]+' '+labels[day.level];
+    }
+  }
+}
+
+function saveEnergyNote(){
+  const inp=document.getElementById('energyNoteInp');
+  if(!inp)return;
+  const data=lsGet(ENERGY_KEY,{});
+  if(!data[currentDate])return;
+  data[currentDate].note=inp.value.trim();
+  lsSet(ENERGY_KEY,data);
+  renderEnergyWeek();
+  showToast('📝 Nota guardada');
 }
 
 function renderEnergyButtons(){
-  const current=loadEnergyForDate(currentDate);
+  const data=lsGet(ENERGY_KEY,{});
+  const day=data[currentDate];
+  const current=day?(day.level||day):null; // support old string format
   ['low','ok','high'].forEach(lv=>{
     const btn=document.getElementById('ebtn-'+lv);
     if(!btn)return;
     btn.className='energy-btn'+(current===lv?' '+ENERGY_CLASSES[lv]:'');
   });
+  // Show note area if energy is set
+  showEnergyNoteArea(!!current);
 }
 
 function renderEnergyWeek(){
@@ -2303,10 +2714,14 @@ function renderEnergyWeek(){
     const d=new Date(monday);d.setDate(monday.getDate()+i);
     const str=d.toISOString().slice(0,10);
     const isCurrent=str===currentDate;
-    const ev=energyData[str];
+    const entry=energyData[str];
+    // Support both old string format and new {level,note} format
+    const level=entry?(entry.level||entry):null;
+    const hasNote=entry&&entry.note&&entry.note.length>0;
     html+=`<div class="ew-day${isCurrent?' ew-current':''}">
       <span class="ew-name">${dayLabels[d.getDay()]}</span>
-      <span class="ew-ico">${ev?ENERGY_ICONS[ev]:'·'}</span>
+      <span class="ew-ico">${level?ENERGY_ICONS[level]:'·'}</span>
+      <div class="ew-note-dot" style="opacity:${hasNote?1:0}"></div>
     </div>`;
   }
   container.innerHTML=html;
@@ -2433,6 +2848,7 @@ function init(){
   try{checkWeightReminder();}catch(e){}
   try{renderEnergyButtons();}catch(e){}
   try{renderEnergyWeek();}catch(e){}
+  try{scheduleAllNotifications();}catch(e){}
 }
 
 init();
