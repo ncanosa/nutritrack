@@ -308,6 +308,16 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
 .food-move{background:none;border:none;cursor:pointer;font-size:.85rem;padding:3px 5px;border-radius:6px;color:var(--muted);transition:all .15s;}
 .food-move:active{color:var(--cyan);}
 .move-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;display:flex;align-items:flex-end;justify-content:center;}
+.food-edit{background:none;border:none;cursor:pointer;font-size:.85rem;padding:3px 5px;border-radius:6px;color:var(--muted);transition:all .15s;}
+.food-edit:active{color:var(--cyan);}
+.edit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:998;display:flex;align-items:flex-end;justify-content:center;}
+.edit-modal-overlay.hidden{display:none;}
+.edit-modal{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 18px calc(20px + var(--safe-bot));width:100%;max-width:480px;}
+.edit-modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px;}
+.edit-fields{display:flex;flex-direction:column;gap:10px;}
+.edit-row{display:flex;gap:8px;align-items:flex-end;}
+.edit-row .form-group{flex:1;}
+.edit-row .inp{width:100%;}
 .move-modal-overlay.hidden{display:none;}
 .move-modal{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 18px calc(20px + var(--safe-bot));width:100%;max-width:480px;}
 .move-modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px;}
@@ -637,6 +647,27 @@ header{border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)
     <div class="recipe-list" id="recipeList"></div>
   </div>
 
+</div>
+
+<div class="edit-modal-overlay hidden" id="editFoodModal" onclick="closeEditModal(event)">
+  <div class="edit-modal">
+    <div class="edit-modal-title">✏️ Editar alimento</div>
+    <div class="edit-fields">
+      <div class="form-group"><label>Nombre</label><input class="inp" id="edit-name" type="text" style="width:100%"></div>
+      <div class="edit-row">
+        <div class="form-group"><label>Kcal</label><input class="inp" id="edit-kcal" type="text" inputmode="decimal" pattern="[0-9.,]*"></div>
+        <div class="form-group"><label>Prot g</label><input class="inp" id="edit-prot" type="text" inputmode="decimal" pattern="[0-9.,]*"></div>
+      </div>
+      <div class="edit-row">
+        <div class="form-group"><label>HC g</label><input class="inp" id="edit-carb" type="text" inputmode="decimal" pattern="[0-9.,]*"></div>
+        <div class="form-group"><label>Grasa g</label><input class="inp" id="edit-fat" type="text" inputmode="decimal" pattern="[0-9.,]*"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn" style="flex:1" onclick="saveEditFood()">Guardar cambios</button>
+        <button class="btn ghost" style="flex:1" onclick="closeEditModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="move-modal-overlay hidden" id="moveFoodModal" onclick="closeMoveModal(event)">
@@ -1332,6 +1363,7 @@ function renderFoodList(mealId,foods){
       </div>
       <div class="food-del-row">
         <button class="food-fav${isFav?' starred':''}" onclick="toggleFav('${mealId}',${i})" title="${isFav?'Quitar favorito':'Agregar favorito'}">${isFav?'⭐':'☆'}</button>
+        <button class="food-edit" onclick="openEditFood('${mealId}',${i})" title="Editar">✏️</button>
         <button class="food-move" onclick="openMoveModal('${mealId}',${i})" title="Mover a otra comida">↕</button>
         <button class="food-del" onclick="removeFood('${mealId}',${i})">✕</button>
       </div>
@@ -1362,10 +1394,10 @@ function renderAddForm(mealId){
     </div>
     <div id="fselected-${mealId}" style="display:none"></div>
     <div class="food-form-row2">
-      <div class="form-group"><label>Kcal</label><input class="inp w-num" id="fkcal-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-      <div class="form-group"><label>Prot g</label><input class="inp w-num" id="fprot-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-      <div class="form-group"><label>HC g</label><input class="inp w-num" id="fcarb-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
-      <div class="form-group"><label>Grasa g</label><input class="inp w-num" id="ffat-${mealId}" type="number" inputmode="decimal" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>Kcal</label><input class="inp w-num" id="fkcal-${mealId}" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>Prot g</label><input class="inp w-num" id="fprot-${mealId}" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>HC g</label><input class="inp w-num" id="fcarb-${mealId}" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
+      <div class="form-group"><label>Grasa g</label><input class="inp w-num" id="ffat-${mealId}" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="–" onkeydown="if(event.key==='Enter')addFood('${mealId}')"></div>
       <button class="btn sm" onclick="addFood('${mealId}')" style="margin-top:19px">+ Agregar</button>
     </div>
     <div class="gram-hint" id="fhint-${mealId}" style="display:none">Los macros se calculan automáticamente según los gramos.</div>
@@ -1448,13 +1480,14 @@ function toggleMeal(id){
   else window._openMeal=null;
 }
 
+function parseNum(v){return parseFloat((v||'').toString().replace(',','.'))||0;}
 function addFood(mealId){
   const nameEl=document.getElementById('fsearch-'+mealId);
   const name=nameEl?nameEl.value.trim():'';
-  const kcal=parseFloat(document.getElementById('fkcal-'+mealId).value)||0;
-  const prot=parseFloat(document.getElementById('fprot-'+mealId).value)||0;
-  const carb=parseFloat(document.getElementById('fcarb-'+mealId).value)||0;
-  const fat=parseFloat(document.getElementById('ffat-'+mealId).value)||0;
+  const kcal=parseNum(document.getElementById('fkcal-'+mealId).value);
+  const prot=parseNum(document.getElementById('fprot-'+mealId).value);
+  const carb=parseNum(document.getElementById('fcarb-'+mealId).value);
+  const fat=parseNum(document.getElementById('ffat-'+mealId).value);
   const grams=parseFloat((document.getElementById('fgrams-'+mealId)||{}).value)||null;
   const sel=window._selectedFood&&window._selectedFood[mealId];
   const displayName=grams&&sel?`${sel.n} (${grams}g)`:name;
@@ -2743,6 +2776,46 @@ function addFavFood(mealId,name,kcal,prot,carb,fat){
   state[mealId].push({name,kcal,prot,carb,fat});
   saveState();window._openMeal=mealId;refresh();
   showToast('✅ '+name+' agregado');
+}
+
+// ══════════════════════════════════════════════════
+//  EDIT FOOD
+// ══════════════════════════════════════════════════
+let _editMeal=null, _editIdx=null;
+
+function openEditFood(mealId, idx){
+  const food = state[mealId] && state[mealId][idx];
+  if(!food) return;
+  _editMeal=mealId; _editIdx=idx;
+  document.getElementById('edit-name').value = food.name||'';
+  document.getElementById('edit-kcal').value = food.kcal||'';
+  document.getElementById('edit-prot').value = food.prot||'';
+  document.getElementById('edit-carb').value = food.carb||'';
+  document.getElementById('edit-fat').value  = food.fat||'';
+  document.getElementById('editFoodModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('edit-name').focus(), 100);
+}
+
+function closeEditModal(e){
+  if(!e || e.target.id==='editFoodModal')
+    document.getElementById('editFoodModal').classList.add('hidden');
+}
+
+function saveEditFood(){
+  if(_editMeal===null || _editIdx===null) return;
+  const name = document.getElementById('edit-name').value.trim();
+  if(!name){ showToast('El nombre no puede estar vacío','err'); return; }
+  const kcal = parseNum(document.getElementById('edit-kcal').value);
+  const prot = parseNum(document.getElementById('edit-prot').value);
+  const carb = parseNum(document.getElementById('edit-carb').value);
+  const fat  = parseNum(document.getElementById('edit-fat').value);
+  state[_editMeal][_editIdx] = {name, kcal, prot, carb, fat};
+  saveState();
+  document.getElementById('editFoodModal').classList.add('hidden');
+  window._openMeal = _editMeal;
+  refresh();
+  showToast('✅ Alimento actualizado');
+  _editMeal=null; _editIdx=null;
 }
 
 // ══════════════════════════════════════════════════
